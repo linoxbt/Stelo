@@ -11,9 +11,12 @@ import HealthMonitor from "./pages/HealthMonitor";
 import Swap from "./pages/Swap";
 import Liquidity from "./pages/Liquidity";
 import Faucet from "./pages/Faucet";
+import Staking from "./pages/Staking";
+import Governance from "./pages/Governance";
+import Liquidation from "./pages/Liquidation";
+import Community from "./pages/Community";
 import DeployGuide from "./pages/DeployGuide";
 import Docs from "./pages/Docs";
-import ComingSoon from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -31,9 +34,12 @@ const App = () => (
           <Route path="/swap" element={<Swap />} />
           <Route path="/liquidity" element={<Liquidity />} />
           <Route path="/faucet" element={<Faucet />} />
+          <Route path="/staking" element={<Staking />} />
+          <Route path="/governance" element={<Governance />} />
+          <Route path="/liquidation" element={<Liquidation />} />
+          <Route path="/community" element={<Community />} />
           <Route path="/deploy" element={<DeployGuide />} />
           <Route path="/docs" element={<Docs />} />
-          <Route path="/coming-soon/:feature" element={<ComingSoon />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
