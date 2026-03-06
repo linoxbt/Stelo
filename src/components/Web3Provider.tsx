@@ -2,14 +2,13 @@ import { FC, ReactNode } from "react";
 import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultConfig, RainbowKitProvider, darkTheme, lightTheme } from "@rainbow-me/rainbowkit";
 import { WagmiProvider } from "wagmi";
-import { baseSepolia } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { rialoTestnet } from "@/lib/chains";
 
 const config = getDefaultConfig({
   appName: "ArcLend",
   projectId: "arclend-demo-project",
-  chains: [baseSepolia, rialoTestnet],
+  chains: [rialoTestnet],
   ssr: false,
 });
 

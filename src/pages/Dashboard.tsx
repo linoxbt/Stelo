@@ -1,33 +1,36 @@
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, DollarSign, Percent, Wallet } from "lucide-react";
+import { TrendingUp, DollarSign, Percent, Wallet, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { NetworkBadge } from "@/components/NetworkBadge";
 import { useWalletState, WalletButton } from "@/components/WalletButton";
 import { useNavigate } from "react-router-dom";
-import { useBalance, useAccount } from "wagmi";
-import { baseSepolia } from "wagmi/chains";
-import { useTokenPrices } from "@/hooks/use-token-prices";
+import { useAccount } from "wagmi";
+import { useVirtualState } from "@/hooks/use-virtual-state";
+import { TokenIcon } from "@/components/TokenIcon";
 
 export default function Dashboard() {
   const { connected } = useWalletState();
   const { address } = useAccount();
   const navigate = useNavigate();
-  const { prices: tokenPrices } = useTokenPrices();
+  const { state, prices, calculateHealthFactor } = useVirtualState(address);
 
-  const { data: ethBalance } = useBalance({
-    address,
-    chainId: baseSepolia.id,
-  });
+  const totalBalance = Object.entries(state.balances).reduce(
+    (sum, [token, amount]) => sum + amount * (prices[token] || 0), 0
+  );
 
-  const formattedBalance = ethBalance
-    ? (Number(ethBalance.value) / 10 ** ethBalance.decimals).toFixed(4)
-    : "0.0000";
+  const totalSupplied = state.supplies.reduce(
+    (sum, s) => sum + s.amount * (prices[s.asset] || 0), 0
+  );
 
-  const ethValue = ethBalance
-    ? ((Number(ethBalance.value) / 10 ** ethBalance.decimals) * tokenPrices.ETH).toFixed(2)
-    : "0.00";
+  const totalBorrowed = state.borrows.reduce(
+    (sum, b) => sum + b.amount * (prices[b.asset] || 0), 0
+  );
+
+  const hf = calculateHealthFactor();
+  const hfDisplay = hf === Infinity ? "—" : hf.toFixed(2);
+  const hfColor = hf === Infinity ? "text-muted-foreground" : hf >= 2 ? "text-green-500" : hf >= 1.5 ? "text-yellow-500" : hf >= 1.2 ? "text-orange-500" : "text-red-500";
 
   if (!connected) {
     return (
@@ -53,10 +56,10 @@ export default function Dashboard() {
 
       <div className="mb-6 grid gap-4 grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "ETH Balance", icon: TrendingUp, value: `${formattedBalance} ETH` },
-          { label: "ETH Value (USD)", icon: DollarSign, value: `$${ethValue}` },
-          { label: "Total Supplied", icon: TrendingUp, value: "$0.00" },
-          { label: "Net APY", icon: Percent, value: "0.00%" },
+          { label: "Wallet Value", icon: DollarSign, value: `$${totalBalance.toFixed(2)}` },
+          { label: "Total Supplied", icon: TrendingUp, value: `$${totalSupplied.toFixed(2)}` },
+          { label: "Total Borrowed", icon: DollarSign, value: `$${totalBorrowed.toFixed(2)}` },
+          { label: "Net APY", icon: Percent, value: state.supplies.length > 0 ? `${(state.supplies.reduce((s, p) => s + p.apy, 0) / state.supplies.length).toFixed(1)}%` : "0.0%" },
         ].map((s, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
             <Card className="glow-purple border-border bg-card">
@@ -72,20 +75,23 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Live Token Prices */}
+      {/* Wallet Balances */}
       <Card className="mb-6 border-border bg-card">
         <CardHeader>
-          <CardTitle className="text-sm text-foreground">Live Token Prices</CardTitle>
+          <CardTitle className="text-sm text-foreground">Wallet Balances</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {Object.entries(tokenPrices).map(([symbol, price]) => (
-              <div key={symbol} className="flex items-center justify-between rounded-lg bg-secondary/50 p-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">{symbol === "ETH" || symbol === "WETH" ? "⟠" : symbol === "USDT" ? "💵" : "💎"}</span>
-                  <span className="text-sm font-medium text-foreground">{symbol}</span>
+          <div className="space-y-3">
+            {Object.entries(state.balances).map(([token, amount]) => (
+              <div key={token} className="flex items-center justify-between rounded-lg bg-secondary/50 p-3">
+                <div className="flex items-center gap-3">
+                  <TokenIcon symbol={token} />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{token}</p>
+                    <p className="text-xs text-muted-foreground">{amount.toFixed(4)}</p>
+                  </div>
                 </div>
-                <span className="text-sm font-bold text-foreground">${(price as number).toFixed(2)}</span>
+                <span className="text-sm font-bold text-foreground">${(amount * (prices[token] || 0)).toFixed(2)}</span>
               </div>
             ))}
           </div>
@@ -95,18 +101,36 @@ export default function Dashboard() {
       <div className="mb-6 grid gap-4 lg:grid-cols-3">
         <Card className="border-border bg-card lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-sm text-foreground">Earnings Over Time</CardTitle>
+            <CardTitle className="text-sm text-foreground">Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex h-60 items-center justify-center text-center">
-              <div>
-                <p className="text-sm text-muted-foreground">No earnings data yet</p>
-                <p className="mt-1 text-xs text-muted-foreground">Supply assets to start earning yield</p>
-                <Button size="sm" className="mt-4" onClick={() => navigate("/markets")}>
-                  Browse Markets
-                </Button>
+            {state.transactions.length === 0 ? (
+              <div className="flex h-40 items-center justify-center text-center">
+                <div>
+                  <p className="text-sm text-muted-foreground">No recent transactions</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Claim tokens from the faucet to get started</p>
+                  <Button size="sm" className="mt-4" onClick={() => navigate("/faucet")}>
+                    Go to Faucet
+                  </Button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {state.transactions.slice(0, 10).map((tx) => (
+                  <div key={tx.id} className="flex items-center justify-between rounded-lg bg-secondary/30 p-3 text-xs">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-3 w-3 text-muted-foreground" />
+                      <span className="font-medium text-foreground capitalize">{tx.type.replace("_", " ")}</span>
+                      <span className="text-muted-foreground">{tx.asset}</span>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-foreground">{tx.amount.toFixed(4)}</p>
+                      <p className="text-muted-foreground font-mono">{tx.txHash.slice(0, 10)}...</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -118,24 +142,15 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center gap-4">
-            <div className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-muted/30 bg-muted/5">
-              <span className="text-3xl font-bold text-muted-foreground">—</span>
+            <div className={`flex h-32 w-32 items-center justify-center rounded-full border-4 ${hf >= 2 ? "border-green-500/30" : hf >= 1.5 ? "border-yellow-500/30" : hf >= 1.2 ? "border-orange-500/30" : hf < Infinity ? "border-red-500/30" : "border-muted/30"} bg-muted/5`}>
+              <span className={`text-3xl font-bold ${hfColor}`}>{hfDisplay}</span>
             </div>
-            <p className="text-center text-xs text-muted-foreground">No active positions</p>
+            <p className="text-center text-xs text-muted-foreground">
+              {hf === Infinity ? "No active borrows" : hf >= 2 ? "Safe" : hf >= 1.5 ? "Early warning" : hf >= 1.2 ? "Caution" : "Liquidation risk"}
+            </p>
           </CardContent>
         </Card>
       </div>
-
-      <Card className="border-border bg-card">
-        <CardHeader>
-          <CardTitle className="text-sm text-foreground">Recent Activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex h-32 items-center justify-center text-center">
-            <p className="text-sm text-muted-foreground">No recent transactions</p>
-          </div>
-        </CardContent>
-      </Card>
     </DashboardLayout>
   );
 }

@@ -1,20 +1,21 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Wallet, AlertTriangle } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Wallet, AlertTriangle, Loader2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useWalletState, WalletButton } from "@/components/WalletButton";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
+import { useAccount } from "wagmi";
+import { useVirtualState } from "@/hooks/use-virtual-state";
+import { TokenIcon } from "@/components/TokenIcon";
 
 interface Asset {
   symbol: string;
   name: string;
-  icon: string;
   supplyAPY: number;
   borrowAPY: number;
   collateralFactor: number;
@@ -23,28 +24,23 @@ interface Asset {
   utilization: number;
 }
 
-const baseSepoliaAssets: Asset[] = [
-  { symbol: "ETH", name: "Ether", icon: "⟠", supplyAPY: 2.8, borrowAPY: 4.5, collateralFactor: 80, liquidationThreshold: 85, totalLiquidity: "$125,000", utilization: 42 },
-  { symbol: "WETH", name: "Wrapped Ether", icon: "⟠", supplyAPY: 3.2, borrowAPY: 5.0, collateralFactor: 78, liquidationThreshold: 82, totalLiquidity: "$98,000", utilization: 38 },
-  { symbol: "USDT", name: "Tether USD", icon: "💵", supplyAPY: 4.1, borrowAPY: 6.2, collateralFactor: 75, liquidationThreshold: 80, totalLiquidity: "$310,000", utilization: 55 },
-];
-
-const rialoAssets: Asset[] = [
-  { symbol: "RIA", name: "Rialo", icon: "💎", supplyAPY: 3.5, borrowAPY: 5.2, collateralFactor: 75, liquidationThreshold: 80, totalLiquidity: "$85,000", utilization: 35 },
-  { symbol: "WETH", name: "Wrapped Ether", icon: "⟠", supplyAPY: 3.0, borrowAPY: 4.8, collateralFactor: 78, liquidationThreshold: 82, totalLiquidity: "$72,000", utilization: 40 },
-  { symbol: "USDT", name: "Tether USD", icon: "💵", supplyAPY: 4.5, borrowAPY: 6.5, collateralFactor: 75, liquidationThreshold: 80, totalLiquidity: "$195,000", utilization: 52 },
+const assets: Asset[] = [
+  { symbol: "RIA", name: "Rialo", supplyAPY: 3.5, borrowAPY: 5.2, collateralFactor: 75, liquidationThreshold: 80, totalLiquidity: "$85,000", utilization: 35 },
+  { symbol: "WETH", name: "Wrapped Ether", supplyAPY: 3.0, borrowAPY: 4.8, collateralFactor: 78, liquidationThreshold: 82, totalLiquidity: "$72,000", utilization: 40 },
+  { symbol: "USDT", name: "Tether USD", supplyAPY: 4.5, borrowAPY: 6.5, collateralFactor: 75, liquidationThreshold: 80, totalLiquidity: "$195,000", utilization: 52 },
+  { symbol: "ALND", name: "ArcLend Token", supplyAPY: 5.2, borrowAPY: 7.8, collateralFactor: 60, liquidationThreshold: 70, totalLiquidity: "$45,000", utilization: 28 },
 ];
 
 export default function Markets() {
   const { connected } = useWalletState();
+  const { address } = useAccount();
   const { toast } = useToast();
-  const [activeNetwork, setActiveNetwork] = useState("base-sepolia");
+  const vs = useVirtualState(address);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"supply" | "borrow">("supply");
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [amount, setAmount] = useState("");
-
-  const assets = activeNetwork === "base-sepolia" ? baseSepoliaAssets : rialoAssets;
+  const [loading, setLoading] = useState(false);
 
   const openModal = (type: "supply" | "borrow") => {
     if (!connected) {
@@ -57,15 +53,34 @@ export default function Markets() {
     setModalOpen(true);
   };
 
-  const handleConfirm = () => {
-    toast({
-      title: "Contracts Not Deployed",
-      description: "Deploy the ArcLend smart contracts first. See the Docs page for instructions.",
-    });
+  const handleConfirm = async () => {
+    if (!selectedAsset || !amount) return;
+    const num = parseFloat(amount);
+    if (isNaN(num) || num <= 0) return;
+
+    setLoading(true);
+    await new Promise((r) => setTimeout(r, 1500));
+
+    if (modalType === "supply") {
+      const ok = vs.supply(selectedAsset.symbol, num, selectedAsset.supplyAPY);
+      if (ok) {
+        toast({ title: "Supply Successful", description: `Supplied ${num} ${selectedAsset.symbol}` });
+      } else {
+        toast({ title: "Insufficient Balance", description: `Not enough ${selectedAsset.symbol}`, variant: "destructive" });
+      }
+    } else {
+      const ok = vs.borrow(selectedAsset.symbol, num, selectedAsset.borrowAPY);
+      if (ok) {
+        toast({ title: "Borrow Successful", description: `Borrowed ${num} ${selectedAsset.symbol}` });
+      } else {
+        toast({ title: "Insufficient Collateral", description: "Supply more assets first", variant: "destructive" });
+      }
+    }
+    setLoading(false);
     setModalOpen(false);
   };
 
-  const currentAssets = activeNetwork === "base-sepolia" ? baseSepoliaAssets : rialoAssets;
+  const balance = selectedAsset ? (vs.state.balances[selectedAsset.symbol] || 0) : 0;
 
   return (
     <DashboardLayout>
@@ -77,53 +92,49 @@ export default function Markets() {
         </div>
       </div>
 
-      <Tabs value={activeNetwork} onValueChange={setActiveNetwork} className="mb-6">
-        <TabsList className="bg-secondary">
-          <TabsTrigger value="base-sepolia">Base Sepolia</TabsTrigger>
-          <TabsTrigger value="rialo">Rialo</TabsTrigger>
-        </TabsList>
-      </Tabs>
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Vertical asset list */}
+      <div className="space-y-3">
         {assets.map((asset, i) => (
-          <motion.div key={asset.symbol + activeNetwork} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+          <motion.div key={asset.symbol} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
             <Card className="glow-purple border-border bg-card transition-all hover:border-primary/30">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">{asset.icon}</span>
-                    <div>
-                      <p className="text-base font-bold text-foreground">{asset.symbol}</p>
-                      <p className="text-xs text-muted-foreground">{asset.name}</p>
+              <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3 min-w-[140px]">
+                  <TokenIcon symbol={asset.symbol} />
+                  <div>
+                    <p className="text-sm font-bold text-foreground">{asset.symbol}</p>
+                    <p className="text-xs text-muted-foreground">{asset.name}</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-1 flex-wrap gap-4 text-xs sm:gap-6">
+                  <div>
+                    <p className="text-muted-foreground">Supply APY</p>
+                    <p className="text-sm font-bold text-green-500">{asset.supplyAPY}%</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Borrow APY</p>
+                    <p className="text-sm font-bold text-orange-500">{asset.borrowAPY}%</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Liquidity</p>
+                    <p className="text-sm font-medium text-foreground">{asset.totalLiquidity}</p>
+                  </div>
+                  <div className="min-w-[80px]">
+                    <p className="text-muted-foreground">Utilization</p>
+                    <div className="flex items-center gap-2">
+                      <Progress value={asset.utilization} className="h-1.5 flex-1" />
+                      <span className="text-foreground">{asset.utilization}%</span>
                     </div>
                   </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-lg bg-secondary/50 p-2.5">
-                    <p className="text-xs text-muted-foreground">Supply APY</p>
-                    <p className="text-lg font-bold text-green-500">{asset.supplyAPY}%</p>
-                  </div>
-                  <div className="rounded-lg bg-secondary/50 p-2.5">
-                    <p className="text-xs text-muted-foreground">Borrow APY</p>
-                    <p className="text-lg font-bold text-orange-500">{asset.borrowAPY}%</p>
+                  <div>
+                    <p className="text-muted-foreground">Your Balance</p>
+                    <p className="text-sm font-medium text-foreground">{(vs.state.balances[asset.symbol] || 0).toFixed(2)}</p>
                   </div>
                 </div>
-                <div className="space-y-1.5 text-xs">
-                  <div className="flex justify-between text-muted-foreground">
-                    <span>Total Liquidity</span>
-                    <span className="text-foreground">{asset.totalLiquidity}</span>
-                  </div>
-                  <div className="flex justify-between text-muted-foreground">
-                    <span>Utilization</span>
-                    <span className="text-foreground">{asset.utilization}%</span>
-                  </div>
-                  <Progress value={asset.utilization} className="h-1.5" />
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" className="flex-1" onClick={() => { setModalType("supply"); setSelectedAsset(asset); setAmount(""); setModalOpen(true); }}>Supply</Button>
-                  <Button size="sm" variant="outline" className="flex-1 border-primary/30 text-primary" onClick={() => { setModalType("borrow"); setSelectedAsset(asset); setAmount(""); setModalOpen(true); }}>Borrow</Button>
+
+                <div className="flex gap-2 shrink-0">
+                  <Button size="sm" onClick={() => { setModalType("supply"); setSelectedAsset(asset); setAmount(""); setModalOpen(true); }}>Supply</Button>
+                  <Button size="sm" variant="outline" className="border-primary/30 text-primary" onClick={() => { setModalType("borrow"); setSelectedAsset(asset); setAmount(""); setModalOpen(true); }}>Borrow</Button>
                 </div>
               </CardContent>
             </Card>
@@ -131,7 +142,6 @@ export default function Markets() {
         ))}
       </div>
 
-      {/* Supply / Borrow Modal */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="border-border bg-card sm:max-w-md">
           <DialogHeader>
@@ -139,56 +149,34 @@ export default function Markets() {
               {modalType === "supply" ? "Supply" : "Borrow"} {selectedAsset?.symbol || "Assets"}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              {modalType === "supply"
-                ? "Deposit assets to earn interest and use as collateral"
-                : "Borrow assets against your supplied collateral"}
+              {modalType === "supply" ? "Deposit assets to earn interest" : "Borrow against your collateral"}
             </DialogDescription>
           </DialogHeader>
 
           {modalType === "borrow" && (
-            <div className="rounded-lg border border-warning/30 bg-warning/5 p-3">
+            <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-3">
               <div className="flex items-start gap-2">
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
-                <div className="text-xs">
-                  <p className="font-semibold text-foreground">Borrowing requires collateral</p>
-                  <p className="text-muted-foreground">You must supply assets as collateral before borrowing. Monitor your health factor to avoid liquidation.</p>
-                </div>
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-yellow-500" />
+                <p className="text-xs text-muted-foreground">Supply assets as collateral before borrowing. Monitor your health factor.</p>
               </div>
-              {modalType === "borrow" && (
-                <div className="mt-3 space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">Borrowing Power Used</span>
-                    <span className="text-foreground">0.0%</span>
-                  </div>
-                  <Progress value={0} className="h-1.5" />
-                  <p className="text-[10px] text-muted-foreground">Available: $0.00</p>
-                </div>
-              )}
             </div>
           )}
 
           <div className="space-y-4 py-2">
-            <div>
-              <label className="mb-2 block text-xs font-medium text-muted-foreground">
-                {modalType === "supply" ? "Select Asset" : "Select Asset to Borrow"}
-              </label>
+            {!selectedAsset && (
               <div className="space-y-2">
-                {currentAssets.map((a) => (
+                {assets.map((a) => (
                   <button
                     key={a.symbol}
                     onClick={() => setSelectedAsset(a)}
-                    className={`flex w-full items-center gap-3 rounded-lg border p-3 transition-colors ${
-                      selectedAsset?.symbol === a.symbol
-                        ? "border-primary bg-primary/5"
-                        : "border-border bg-secondary/30 hover:border-primary/30"
-                    }`}
+                    className="flex w-full items-center gap-3 rounded-lg border border-border bg-secondary/30 p-3 hover:border-primary/30"
                   >
-                    <span className="text-xl">{a.icon}</span>
+                    <TokenIcon symbol={a.symbol} size="sm" />
                     <span className="text-sm font-medium text-foreground">{a.symbol}</span>
                   </button>
                 ))}
               </div>
-            </div>
+            )}
 
             {selectedAsset && (
               <>
@@ -196,63 +184,28 @@ export default function Markets() {
                   <div className="mb-1.5 flex items-center justify-between">
                     <label className="text-xs text-muted-foreground">Amount</label>
                     <span className="text-xs text-muted-foreground">
-                      {modalType === "supply" ? "Balance" : "Available"}: 0.0000 {selectedAsset.symbol}
+                      Balance: {balance.toFixed(4)} {selectedAsset.symbol}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Input
-                      placeholder="0.00"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className="border-border bg-secondary"
-                    />
-                    <Button variant="outline" size="sm" className="shrink-0 text-xs" onClick={() => setAmount("0")}>
-                      MAX
-                    </Button>
+                    <Input placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} className="border-border bg-secondary" />
+                    <Button variant="outline" size="sm" className="shrink-0 text-xs" onClick={() => setAmount(balance.toString())}>MAX</Button>
                   </div>
                 </div>
 
                 <div className="rounded-lg border border-border bg-secondary/30 p-3 space-y-2 text-xs">
-                  <p className="font-medium text-muted-foreground">Transaction Overview</p>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{modalType === "supply" ? "Supply APY" : "Borrow APY (Variable)"}</span>
+                    <span className="text-muted-foreground">{modalType === "supply" ? "Supply APY" : "Borrow APY"}</span>
                     <span className="text-foreground">{modalType === "supply" ? selectedAsset.supplyAPY : selectedAsset.borrowAPY}%</span>
                   </div>
-                  {modalType === "supply" ? (
-                    <>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Collateral Factor (LTV)</span>
-                        <span className="text-foreground">{selectedAsset.collateralFactor}%</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Liquidation Threshold</span>
-                        <span className="text-foreground">{selectedAsset.liquidationThreshold}%</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Can be collateral</span>
-                        <span className="text-green-500">✓</span>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Health Factor</span>
-                        <span className="text-foreground">0.00</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Liquidation Threshold</span>
-                        <span className="text-foreground">{selectedAsset.liquidationThreshold}%</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Liquidation Penalty</span>
-                        <span className="text-foreground">5%</span>
-                      </div>
-                    </>
-                  )}
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Collateral Factor</span>
+                    <span className="text-foreground">{selectedAsset.collateralFactor}%</span>
+                  </div>
                 </div>
 
-                <Button className="w-full glow-purple" disabled={!amount} onClick={handleConfirm}>
-                  {modalType === "supply" ? "Confirm Supply" : "Confirm Borrow"}
+                <Button className="w-full glow-purple" disabled={!amount || loading} onClick={handleConfirm}>
+                  {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...</> : `Confirm ${modalType === "supply" ? "Supply" : "Borrow"}`}
                 </Button>
               </>
             )}
