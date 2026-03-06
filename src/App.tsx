@@ -18,12 +18,14 @@ import Community from "./pages/Community";
 import DeployGuide from "./pages/DeployGuide";
 import Docs from "./pages/Docs";
 import NotFound from "./pages/NotFound";
+import { AIChatBot } from "./components/AIChatBot";
 
 const App = () => (
   <Web3Provider>
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <AIChatBot />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />

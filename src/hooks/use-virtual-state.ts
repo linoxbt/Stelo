@@ -323,7 +323,7 @@ export function useVirtualState(address: string | undefined) {
 
   // ─── Staking ───
   const APY_MULTIPLIERS: Record<number, number> = { 0: 1, 30: 1.25, 90: 1.5, 180: 2, 365: 3 };
-  const BASE_STAKING_APY = 12;
+  const BASE_STAKING_APY = 4;
 
   const stake = useCallback(
     (amount: number, lockDays: number) => {

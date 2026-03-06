@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { TrendingUp, DollarSign, Percent, Wallet, Clock } from "lucide-react";
+import { TrendingUp, DollarSign, Percent, Wallet, Clock, BarChart3, Users, Layers } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DashboardLayout } from "@/components/DashboardLayout";
@@ -9,12 +9,44 @@ import { useNavigate } from "react-router-dom";
 import { useAccount } from "wagmi";
 import { useVirtualState } from "@/hooks/use-virtual-state";
 import { TokenIcon } from "@/components/TokenIcon";
+import { useState, useEffect } from "react";
+
+// Simulated protocol-wide stats that increment slowly
+function useProtocolStats() {
+  const [stats, setStats] = useState({
+    tvl: 4_218_340,
+    totalBorrowed: 1_892_100,
+    totalLiquidity: 2_654_900,
+    activeUsers: 1_847,
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStats((prev) => ({
+        tvl: prev.tvl + Math.random() * 500 - 100,
+        totalBorrowed: prev.totalBorrowed + Math.random() * 200 - 50,
+        totalLiquidity: prev.totalLiquidity + Math.random() * 300 - 80,
+        activeUsers: prev.activeUsers + (Math.random() > 0.7 ? 1 : 0),
+      }));
+    }, 15000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return stats;
+}
+
+function formatUSD(n: number) {
+  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
+  if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`;
+  return `$${n.toFixed(2)}`;
+}
 
 export default function Dashboard() {
   const { connected } = useWalletState();
   const { address } = useAccount();
   const navigate = useNavigate();
   const { state, prices, calculateHealthFactor } = useVirtualState(address);
+  const protocolStats = useProtocolStats();
 
   const totalBalance = Object.entries(state.balances).reduce(
     (sum, [token, amount]) => sum + amount * (prices[token] || 0), 0
@@ -54,6 +86,29 @@ export default function Dashboard() {
         <NetworkBadge />
       </div>
 
+      {/* Protocol Stats */}
+      <div className="mb-6 grid gap-3 grid-cols-2 lg:grid-cols-4">
+        {[
+          { label: "Protocol TVL", icon: Layers, value: formatUSD(protocolStats.tvl) },
+          { label: "Total Borrowed", icon: BarChart3, value: formatUSD(protocolStats.totalBorrowed) },
+          { label: "Total Liquidity", icon: DollarSign, value: formatUSD(protocolStats.totalLiquidity) },
+          { label: "Active Users", icon: Users, value: protocolStats.activeUsers.toLocaleString() },
+        ].map((s, i) => (
+          <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+            <Card className="border-border bg-card">
+              <CardContent className="p-3 sm:p-4">
+                <div className="mb-1 flex items-center justify-between">
+                  <span className="text-[10px] sm:text-xs text-muted-foreground">{s.label}</span>
+                  <s.icon className="h-3.5 w-3.5 text-muted-foreground" />
+                </div>
+                <p className="text-sm sm:text-lg font-bold text-foreground">{s.value}</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* User Stats */}
       <div className="mb-6 grid gap-4 grid-cols-2 lg:grid-cols-4">
         {[
           { label: "Wallet Value", icon: DollarSign, value: `$${totalBalance.toFixed(2)}` },
@@ -115,8 +170,8 @@ export default function Dashboard() {
                 </div>
               </div>
             ) : (
-              <div className="space-y-2 max-h-60 overflow-y-auto">
-                {state.transactions.slice(0, 10).map((tx) => (
+              <div className="space-y-2 max-h-72 overflow-y-auto">
+                {state.transactions.slice(0, 15).map((tx) => (
                   <div key={tx.id} className="flex items-center justify-between rounded-lg bg-secondary/30 p-3 text-xs">
                     <div className="flex items-center gap-2">
                       <Clock className="h-3 w-3 text-muted-foreground" />
@@ -125,7 +180,8 @@ export default function Dashboard() {
                     </div>
                     <div className="text-right">
                       <p className="text-foreground">{tx.amount.toFixed(4)}</p>
-                      <p className="text-muted-foreground font-mono">{tx.txHash.slice(0, 10)}...</p>
+                      <p className="text-muted-foreground font-mono text-[10px]">{tx.txHash.slice(0, 10)}...{tx.txHash.slice(-6)}</p>
+                      <p className="text-muted-foreground text-[10px]">{new Date(tx.timestamp).toLocaleString()}</p>
                     </div>
                   </div>
                 ))}
