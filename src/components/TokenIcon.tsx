@@ -1,24 +1,29 @@
 import { cn } from "@/lib/utils";
 
-const TOKEN_STYLES: Record<string, { bg: string; text: string; label: string }> = {
-  RIA: { bg: "bg-purple-500/20", text: "text-purple-400", label: "💎" },
-  WETH: { bg: "bg-blue-500/20", text: "text-blue-400", label: "⟠" },
-  USDT: { bg: "bg-green-500/20", text: "text-green-400", label: "₮" },
-  ALND: { bg: "bg-indigo-500/20", text: "text-indigo-300", label: "A" },
+const TOKEN_IMAGES: Record<string, string> = {
+  RIA: "/assets/tokens/ria.png",
+  WETH: "/assets/tokens/weth.png",
+  USDT: "/assets/tokens/usdt.png",
+  ALND: "/assets/tokens/alnd.png",
 };
 
 export function TokenIcon({ symbol, size = "md" }: { symbol: string; size?: "sm" | "md" | "lg" }) {
-  const style = TOKEN_STYLES[symbol] || { bg: "bg-muted", text: "text-muted-foreground", label: "?" };
-  const sizeClass = size === "sm" ? "h-6 w-6 text-xs" : size === "lg" ? "h-10 w-10 text-lg" : "h-8 w-8 text-sm";
+  const sizeClass = size === "sm" ? "h-6 w-6" : size === "lg" ? "h-10 w-10" : "h-8 w-8";
+  const src = TOKEN_IMAGES[symbol];
 
-  if (symbol === "RIA" || symbol === "WETH" || symbol === "USDT") {
-    return <span className={cn("flex items-center justify-center rounded-full", sizeClass)}>{style.label}</span>;
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={symbol}
+        className={cn("rounded-full object-cover", sizeClass)}
+      />
+    );
   }
 
-  // ALND: navy circle with A
   return (
-    <span className={cn("flex items-center justify-center rounded-full bg-indigo-900 font-bold text-white", sizeClass)}>
-      {style.label}
+    <span className={cn("flex items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground", sizeClass)}>
+      {symbol?.slice(0, 3) || "?"}
     </span>
   );
 }
