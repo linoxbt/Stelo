@@ -23,22 +23,25 @@ const sections: DocSection[] = [
     content: (
       <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
         <p>
-          ArcLend is a decentralized financial protocol built for the Rialo Network. It provides a unified platform where users can lend and borrow assets, swap tokens, supply liquidity to trading pools, stake governance tokens, and monitor their portfolio health,stodians.
+          ArcLend is a decentralized financial protocol built for the Rialo Network. It provides a unified platform where users can lend and borrow assets, swap tokens, supply liquidity to trading pools, stake governance tokens, and monitor their portfolio health, all without intermediaries or custodians.
         </p>
         <p>
           The protocol combines six core financial primitives into a single application: a lending market with variable interest rates, a constant-product automated market maker for token swaps, dual-sided liquidity pools with fee sharing, a multi-tier staking system tied to protocol revenue, a real-time health factor monitor with configurable alerts, and a testnet faucet for onboarding new users.
         </p>
         <p>
-          ArcLend borrows its lending mechanics from the well-established patterns of Aave �: u: u: u: u: u: u: u: u: u: u: utilization-driven interest rates, over-collateralized borrowing, and a transparent liquidation framework. It extends    The protocol currently runs on <strong className="text-foreground">Rialo Testnet</strong>. Wallet connection is real, but all subsequent transactions — supply, borrow, swap, stake, claim — execute in a virtual simulation. This allows the Rialo community to experience the full protocol before mainnet deployment, without risking real funds.
+          ArcLend borrows its lending mechanics from the well-established patterns of Aave: utilization-driven interest rates, over-collateralized borrowing, and a transparent liquidation framework. It extends the scope to include swap, liquidity, and staking features that make it a self-contained DeFi layer for Rialo.
+        </p>
+        <p>
+          The protocol currently runs on <strong className="text-foreground">Rialo Testnet</strong>. Wallet connection is real, but all subsequent transactions (supply, borrow, swap, stake, claim) execute in a virtual simulation. This allows the Rialo community to experience the full protocol before mainnet deployment, without risking real funds.
         </p>
 
         <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-2">
           <p className="font-semibold text-foreground">Supported Assets</p>
           <div className="space-y-1.5">
-            <p><strong className="text-foreground">RIA</strong> — Rialo's native gas and utility token. Accepted as collateral, used for swap pairs, and distributed through the testnet faucet.</p>
-            <p><strong className="text-foreground">WETH</strong> — Wrapped Ether. A tokenized version of ETH conforming to the ERC-20 standard. Widely used as a trading pair and high-value collateral asset.</p>
-            <p><strong className="text-foreground">USDT</strong> — Tether USD. A fiat-backed stablecoin pegged to the US dollar. Provides a stable unit of account for lending, borrowing, swaps, and liquidity provision.</p>
-            <p><strong className="text-foreground">ALND</strong> — ArcLend's governance and staking token. Holders stake ALND to earn a share of protocol revenue and vote on proposals that shape the protocol's direction.</p>
+            <p><strong className="text-foreground">RIA</strong>: Rialo's native gas and utility token. Accepted as collateral, used for swap pairs, and distributed through the testnet faucet.</p>
+            <p><strong className="text-foreground">WETH</strong>: Wrapped Ether. A tokenized version of ETH conforming to the ERC-20 standard. Widely used as a trading pair and high-value collateral asset.</p>
+            <p><strong className="text-foreground">USDT</strong>: Tether USD. A fiat-backed stablecoin pegged to the US dollar. Provides a stable unit of account for lending, borrowing, swaps, and liquidity provision.</p>
+            <p><strong className="text-foreground">ALND</strong>: ArcLend's governance and staking token. Holders stake ALND to earn a share of protocol revenue and vote on proposals that shape the protocol's direction.</p>
           </div>
         </div>
       </div>
@@ -51,7 +54,7 @@ const sections: DocSection[] = [
     content: (
       <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
         <p>
-          New Layer 1 blockchains face a fundamental bootstrapping challenge. Without financial infrastructure — lending markets, swap venues, staking mechanisms — users have no productive way to use their tokens. Capital sits idle in wallets. Developers building applications on the chain have no liquidity layer to plug into. The result is a chain with potential but no financial activity.
+          New Layer 1 blockchains face a fundamental bootstrapping challenge. Without financial infrastructure (lending markets, swap venues, staking mechanisms) users have no productive way to use their tokens. Capital sits idle in wallets. Developers building applications on the chain have no liquidity layer to plug into. The result is a chain with potential but no financial activity.
         </p>
         <p>
           The common workaround is forking an existing protocol and deploying it on the new chain. This rarely works well. Forked protocols arrive with assumptions about oracle infrastructure, governance participation, and liquidity depth that simply do not exist on a young network. The fork launches, attracts minimal liquidity, and stagnates because it was never designed to grow with the ecosystem it landed on.
@@ -60,7 +63,7 @@ const sections: DocSection[] = [
           Rialo Network faces this exact situation. It is a high-throughput, low-fee chain with a growing developer community, but it lacks a native DeFi layer that can serve as the foundation for financial applications. Users who hold RIA have no way to earn yield on it. Builders who want to integrate lending or swaps into their applications have no on-chain primitives to call.
         </p>
         <p>
-          ArcLend exists to fill that gap — not as a fork dropped onto Rialo, but as a purpose-built protocol designed for the chain's fee structure, community, and roadmap. The goal is to be the first financial layer that makes Rialo a chain where capital is productive from day one.
+          ArcLend exists to fill that gap, not as a fork dropped onto Rialo, but as a purpose-built protocol designed for the chain's fee structure, community, and roadmap. The goal is to be the first financial layer that makes Rialo a chain where capital is productive from day one.
         </p>
       </div>
     ),
@@ -72,13 +75,13 @@ const sections: DocSection[] = [
     content: (
       <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
         <p>
-          <strong className="text-foreground">Mission:</strong> To build reliable, transparent, and community-governed financial infrastructure on Rialo Network — enabling anyone to lend, borrow, swap, provide liquidity, and stake without intermediaries.
+          <strong className="text-foreground">Mission:</strong> To build reliable, transparent, and community-governed financial infrastructure on Rialo Network, enabling anyone to lend, borrow, swap, provide liquidity, and stake without intermediaries.
         </p>
         <p>
-          <strong className="text-foreground">Vision:</strong> ArcLend will become the primary liquidity layer on Rialo. When users want to put capital to work, when builders need on-chain financial primitives, when institutions evaluate the chain's DeFi maturity — ArcLend is where they go.
+          <strong className="text-foreground">Vision:</strong> ArcLend will become the primary liquidity layer on Rialo. When users want to put capital to work, when builders need on-chain financial primitives, when institutions evaluate the chain's DeFi maturity, ArcLend is where they go.
         </p>
         <p>
-          The protocol is designed to grow alongside Rialo. As the network attracts more users, applications, and capital, ArcLend deepens the liquidity that makes those applications viable. More activity generates more protocol revenue, which flows to stakers, which attracts more ALND holders, which strengthens governance — a compounding cycle.
+          The protocol is designed to grow alongside Rialo. As the network attracts more users, applications, and capital, ArcLend deepens the liquidity that makes those applications viable. More activity generates more protocol revenue, which flows to stakers, which attracts more ALND holders, which strengthens governance: a compounding cycle.
         </p>
         <p>
           Long-term, the roadmap extends beyond the current feature set. Fixed-rate lending, under-collateralized institutional credit with on-chain scoring, cross-chain liquidity bridges, and structured yield products are all on the horizon. But the foundation comes first: a multi-feature protocol that works reliably, is governed transparently, and earns trust through consistent operation.
@@ -98,7 +101,7 @@ const sections: DocSection[] = [
         <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-3">
           <div>
             <p className="font-semibold text-foreground">1. Borrowing Interest Spread</p>
-            <p>When users borrow assets, they pay variable interest. A portion of that interest — the reserve factor, initially set at 10% — is retained by the protocol treasury rather than passed to suppliers. This funds development, audits, and ecosystem grants.</p>
+            <p>When users borrow assets, they pay variable interest. A portion of that interest (the reserve factor, initially set at 10%) is retained by the protocol treasury rather than passed to suppliers. This funds development, audits, and ecosystem grants.</p>
           </div>
           <div>
             <p className="font-semibold text-foreground">2. Swap Fees</p>
@@ -113,7 +116,7 @@ const sections: DocSection[] = [
           These three revenue streams fund protocol development (engineering, security audits, infrastructure), staking rewards for ALND holders, and a community grants program for builders creating tools on Rialo.
         </p>
         <p>
-          Because revenue is tied to actual protocol usage — borrowing, swapping, and liquidations — the model remains sustainable regardless of market sentiment. There is no reliance on inflationary token emissions. Governance controls how treasury funds are allocated: ALND stakers vote on reserve factors, fee structures, and spending priorities.
+          Because revenue is tied to actual protocol usage (borrowing, swapping, and liquidations) the model remains sustainable regardless of market sentiment. There is no reliance on inflationary token emissions. Governance controls how treasury funds are allocated: ALND stakers vote on reserve factors, fee structures, and spending priorities.
         </p>
       </div>
     ),
@@ -130,11 +133,11 @@ const sections: DocSection[] = [
         <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-3">
           <div>
             <p className="font-semibold text-foreground">Lending Pool</p>
-            <p>The central contract managing supply and borrow operations. When a user deposits an asset, the pool mints nTokens (interest-bearing receipt tokens) proportional to the deposit. Borrowing issues vDebt tokens that track the growing debt. Interest rates are calculated algorithmically based on utilization — higher utilization pushes rates up, rebalancing supply and demand.</p>
+            <p>The central contract managing supply and borrow operations. When a user deposits an asset, the pool mints nTokens (interest-bearing receipt tokens) proportional to the deposit. Borrowing issues vDebt tokens that track the growing debt. Interest rates are calculated algorithmically based on utilization: higher utilization pushes rates up, rebalancing supply and demand.</p>
           </div>
           <div>
             <p className="font-semibold text-foreground">AMM (Automated Market Maker)</p>
-            <p>A constant-product market maker (x × y = k) that enables instant token swaps. Liquidity providers deposit equal-value token pairs and earn a share of trading fees. The AMM operates as an independent module but is integrated directly into the ArcLend interface.</p>
+            <p>A constant-product market maker (x * y = k) that enables instant token swaps. Liquidity providers deposit equal-value token pairs and earn a share of trading fees. The AMM operates as an independent module but is integrated directly into the ArcLend interface.</p>
           </div>
           <div>
             <p className="font-semibold text-foreground">Staking Module</p>
@@ -142,7 +145,7 @@ const sections: DocSection[] = [
           </div>
           <div>
             <p className="font-semibold text-foreground">nTokens (Deposit Receipts)</p>
-            <p>When you supply 100 USDT, you receive nUSDT. These tokens accrue value over time as borrowers pay interest. When you withdraw, you burn nUSDT and receive your original deposit plus earned interest. nTokens are standard ERC-20 tokens — they can be transferred, composed with other protocols, or held in multi-sig wallets.</p>
+            <p>When you supply 100 USDT, you receive nUSDT. These tokens accrue value over time as borrowers pay interest. When you withdraw, you burn nUSDT and receive your original deposit plus earned interest. nTokens are standard ERC-20 tokens and can be transferred, composed with other protocols, or held in multi-sig wallets.</p>
           </div>
           <div>
             <p className="font-semibold text-foreground">vDebt Tokens (Debt Tracking)</p>
@@ -173,7 +176,7 @@ const sections: DocSection[] = [
           <div>
             <p className="font-semibold text-foreground">Supplying Assets</p>
             <p>
-              Depositing assets into the lending pool adds them to shared liquidity that borrowers draw from. You receive nTokens that appreciate as borrowers pay interest. Your deposit also serves as collateral — its value determines how much you can borrow.
+              Depositing assets into the lending pool adds them to shared liquidity that borrowers draw from. You receive nTokens that appreciate as borrowers pay interest. Your deposit also serves as collateral: its value determines how much you can borrow.
             </p>
           </div>
           <div>
@@ -191,10 +194,10 @@ const sections: DocSection[] = [
           <div>
             <p className="font-semibold text-foreground">Key Parameters</p>
             <ul className="list-inside list-disc space-y-1 mt-1">
-              <li>LTV (Loan-to-Value) — 75% for all assets</li>
-              <li>Liquidation Threshold — 80%</li>
-              <li>Liquidation Penalty — 5% bonus to liquidators</li>
-              <li>Reserve Factor — 10% of borrower interest to treasury</li>
+              <li>LTV (Loan-to-Value): 75% for all assets</li>
+              <li>Liquidation Threshold: 80%</li>
+              <li>Liquidation Penalty: 5% bonus to liquidators</li>
+              <li>Reserve Factor: 10% of borrower interest to treasury</li>
             </ul>
           </div>
         </div>
@@ -208,18 +211,18 @@ const sections: DocSection[] = [
     content: (
       <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
         <p>
-          The swap module lets users exchange any supported token for another directly within ArcLend. It runs on an automated market maker — no order books, no counterparty matching, no waiting.
+          The swap module lets users exchange any supported token for another directly within ArcLend. It runs on an automated market maker with no order books, no counterparty matching, and no waiting.
         </p>
         <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-3">
           <div>
             <p className="font-semibold text-foreground">How Swaps Work</p>
             <p>
-              The AMM uses the constant product formula (x × y = k). When you swap RIA for USDT, you add RIA to the pool and remove USDT. The exchange rate is determined by the pool's current reserves. Larger trades relative to pool size result in more slippage — the price moves against you because you are changing the reserve ratio more dramatically.
+              The AMM uses the constant product formula (x * y = k). When you swap RIA for USDT, you add RIA to the pool and remove USDT. The exchange rate is determined by the pool's current reserves. Larger trades relative to pool size result in more slippage because you are changing the reserve ratio more dramatically.
             </p>
           </div>
           <div>
             <p className="font-semibold text-foreground">Fees</p>
-            <p>Each swap incurs a 0.3% fee. 0.25% goes to liquidity providers for the trading pair. 0.05% flows to the protocol treasury. Slippage tolerance is configurable — default is 0.5%.</p>
+            <p>Each swap incurs a 0.3% fee. 0.25% goes to liquidity providers for the trading pair. 0.05% flows to the protocol treasury. Slippage tolerance is configurable with a default of 0.5%.</p>
           </div>
           <div>
             <p className="font-semibold text-foreground">Available Pairs</p>
@@ -228,7 +231,7 @@ const sections: DocSection[] = [
           <div>
             <p className="font-semibold text-foreground">Why Swap Inside ArcLend?</p>
             <p>
-              Having swaps within the protocol means users do not need to leave the platform to rebalance their portfolio. Need more USDT to repay a borrow position? Swap RIA for USDT and repay — all in one session. This composability between swap, lending, and staking reduces friction and keeps capital circulating within the ecosystem.
+              Having swaps within the protocol means users do not need to leave the platform to rebalance their portfolio. Need more USDT to repay a borrow position? Swap RIA for USDT and repay, all in one session. This composability between swap, lending, and staking reduces friction and keeps capital circulating within the ecosystem.
             </p>
           </div>
         </div>
@@ -242,13 +245,13 @@ const sections: DocSection[] = [
     content: (
       <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
         <p>
-          Liquidity pools are the backbone of the swap module. Without liquidity providers, there are no tokens in the pool for traders to swap against. By depositing tokens, you enable trading — and earn fees for that service.
+          Liquidity pools are the backbone of the swap module. Without liquidity providers, there are no tokens in the pool for traders to swap against. By depositing tokens, you enable trading and earn fees for that service.
         </p>
         <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-3">
           <div>
             <p className="font-semibold text-foreground">Adding Liquidity</p>
             <p>
-              You deposit two tokens in equal dollar value — for example, $500 of RIA and $500 of USDT into the RIA/USDT pool. In return, you receive LP tokens representing your proportional share of the pool. As trades flow through the pool, fees accumulate and increase the value of your LP tokens.
+              You deposit two tokens in equal dollar value. For example, $500 of RIA and $500 of USDT into the RIA/USDT pool. In return, you receive LP tokens representing your proportional share of the pool. As trades flow through the pool, fees accumulate and increase the value of your LP tokens.
             </p>
           </div>
           <div>
@@ -282,7 +285,7 @@ const sections: DocSection[] = [
           <div>
             <p className="font-semibold text-foreground">Where Do Staking Rewards Come From?</p>
             <p>
-              Staking rewards are funded entirely by protocol revenue — not by printing new tokens. Three revenue streams feed the staking rewards pool:
+              Staking rewards are funded entirely by protocol revenue, not by printing new tokens. Three revenue streams feed the staking rewards pool:
             </p>
             <ul className="list-inside list-disc space-y-1 mt-2">
               <li><strong className="text-foreground">Borrowing interest reserve:</strong> 10% of all interest paid by borrowers is collected by the treasury. A portion of this is allocated to staking rewards.</li>
@@ -297,11 +300,11 @@ const sections: DocSection[] = [
             <p className="font-semibold text-foreground">Lock Tiers & APY</p>
             <p>Longer commitment earns higher returns. Each lock tier carries a multiplier on the base reward rate:</p>
             <ul className="list-inside list-disc space-y-1 mt-1">
-              <li>Flexible (no lock) — Base rate (1x multiplier)</li>
-              <li>30 days — 1.25x multiplier</li>
-              <li>90 days — 1.5x multiplier</li>
-              <li>180 days — 2x multiplier</li>
-              <li>365 days — 3x multiplier</li>
+              <li>Flexible (no lock): Base rate (1x multiplier)</li>
+              <li>30 days: 1.25x multiplier</li>
+              <li>90 days: 1.5x multiplier</li>
+              <li>180 days: 2x multiplier</li>
+              <li>365 days: 3x multiplier</li>
             </ul>
             <p className="mt-2">
               Actual APY fluctuates based on total ALND staked and protocol revenue. The multipliers reward users who demonstrate longer-term commitment and help reduce circulating supply volatility.
@@ -310,12 +313,12 @@ const sections: DocSection[] = [
           <div>
             <p className="font-semibold text-foreground">Unstaking & Warmup Period</p>
             <p>
-              When you unstake, your ALND enters a 3-day warmup period before returning to your wallet. During warmup, the tokens do not earn rewards and cannot vote. This prevents flash-staking — where someone stakes briefly to capture rewards or influence a governance vote, then immediately withdraws.
+              When you unstake, your ALND enters a 3-day warmup period before returning to your wallet. During warmup, the tokens do not earn rewards and cannot vote. This prevents flash-staking, where someone stakes briefly to capture rewards or influence a governance vote, then immediately withdraws.
             </p>
           </div>
           <div>
             <p className="font-semibold text-foreground">Governance Power</p>
-            <p>1 staked ALND = 1 vote. Only staked tokens carry voting weight — unstaked ALND in your wallet has zero governance power. This ensures decisions are made by participants with real commitment to the protocol.</p>
+            <p>1 staked ALND = 1 vote. Only staked tokens carry voting weight. Unstaked ALND in your wallet has zero governance power. This ensures decisions are made by participants with real commitment to the protocol.</p>
           </div>
         </div>
       </div>
@@ -333,17 +336,17 @@ const sections: DocSection[] = [
         <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-3">
           <div>
             <p className="font-semibold text-foreground">Calculation</p>
-            <p>Health Factor = (Total Collateral Value × Liquidation Threshold) ÷ Total Debt Value</p>
-            <p className="mt-2">Example: $1,000 of RIA supplied (80% liquidation threshold) and $400 of USDT borrowed gives HF = ($1,000 × 0.80) ÷ $400 = 2.0. That is a comfortable position.</p>
+            <p>Health Factor = (Total Collateral Value x Liquidation Threshold) / Total Debt Value</p>
+            <p className="mt-2">Example: $1,000 of RIA supplied (80% liquidation threshold) and $400 of USDT borrowed gives HF = ($1,000 x 0.80) / $400 = 2.0. That is a comfortable position.</p>
           </div>
           <div>
             <p className="font-semibold text-foreground">Risk Levels</p>
             <ul className="list-inside list-disc space-y-1">
-              <li>HF ≥ 2.0 — Safe. Collateral comfortably covers debt.</li>
-              <li>1.5 ≤ HF &lt; 2.0 — Early warning. Consider reducing debt or adding collateral.</li>
-              <li>1.2 ≤ HF &lt; 1.5 — Caution. Approaching the danger zone.</li>
-              <li>1.0 ≤ HF &lt; 1.2 — High risk. A moderate price swing could trigger liquidation.</li>
-              <li>HF &lt; 1.0 — Liquidation eligible. Any user can liquidate your position.</li>
+              <li>HF greater than or equal to 2.0: Safe. Collateral comfortably covers debt.</li>
+              <li>1.5 to 2.0: Early warning. Consider reducing debt or adding collateral.</li>
+              <li>1.2 to 1.5: Caution. Approaching the danger zone.</li>
+              <li>1.0 to 1.2: High risk. A moderate price swing could trigger liquidation.</li>
+              <li>Below 1.0: Liquidation eligible. Any user can liquidate your position.</li>
             </ul>
           </div>
           <div>
@@ -355,7 +358,7 @@ const sections: DocSection[] = [
           <div>
             <p className="font-semibold text-foreground">Alert System</p>
             <p>
-              ArcLend's health monitor lets you configure threshold alerts. When your HF crosses a level you have set — 1.5, 1.2, 1.0, or a custom value — you receive a notification. Email and Telegram alerts can be configured in the Health Monitor settings so you have time to act before liquidation occurs.
+              ArcLend's health monitor lets you configure threshold alerts. When your HF crosses a level you have set (1.5, 1.2, 1.0, or a custom value) you receive a notification. Email and Telegram alerts can be configured in the Health Monitor settings so you have time to act before liquidation occurs.
             </p>
           </div>
         </div>
@@ -375,9 +378,9 @@ const sections: DocSection[] = [
           <div>
             <p className="font-semibold text-foreground">What Can Be Governed</p>
             <ul className="list-inside list-disc space-y-1">
-              <li>Protocol parameters — reserve factor, LTV ratios, liquidation thresholds, interest rate slopes</li>
+              <li>Protocol parameters: reserve factor, LTV ratios, liquidation thresholds, interest rate slopes</li>
               <li>Adding or removing supported assets</li>
-              <li>Treasury allocation — development funding, community grants, staking reward distribution, token buybacks</li>
+              <li>Treasury allocation: development funding, community grants, staking reward distribution, token buybacks</li>
               <li>Fee structure adjustments across lending, swaps, and liquidations</li>
               <li>Smart contract upgrades and module additions</li>
             </ul>
@@ -409,15 +412,15 @@ const sections: DocSection[] = [
           <div>
             <p className="font-semibold text-foreground">Claim Amounts</p>
             <ul className="list-inside list-disc space-y-1">
-              <li>RIA — 100 tokens per claim</li>
-              <li>WETH — 1 token per claim</li>
-              <li>USDT — 1,000 tokens per claim</li>
-              <li>ALND — 100 tokens per claim</li>
+              <li>RIA: 100 tokens per claim</li>
+              <li>WETH: 1 token per claim</li>
+              <li>USDT: 1,000 tokens per claim</li>
+              <li>ALND: 100 tokens per claim</li>
             </ul>
           </div>
           <div>
             <p className="font-semibold text-foreground">Cooldown</p>
-            <p>Each token has a 24-hour cooldown per wallet address. Cooldowns are tracked independently — you can claim RIA even if WETH is still on cooldown. A countdown timer shows exactly when each token becomes claimable again.</p>
+            <p>Each token has a 24-hour cooldown per wallet address. Cooldowns are tracked independently. You can claim RIA even if WETH is still on cooldown. A countdown timer shows exactly when each token becomes claimable again.</p>
           </div>
           <div>
             <p className="font-semibold text-foreground">Claim All</p>
@@ -434,18 +437,18 @@ const sections: DocSection[] = [
     content: (
       <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
         <p>
-          ArcLend includes a contract deployment interface for developers building on Rialo. Deploy standard smart contract templates directly from the browser — no local development environment needed.
+          ArcLend includes a contract deployment interface for developers building on Rialo. Deploy standard smart contract templates directly from the browser with no local development environment needed.
         </p>
         <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-3">
           <div>
             <p className="font-semibold text-foreground">Available Templates</p>
             <ul className="list-inside list-disc space-y-1">
-              <li>ERC-20 Token — Fungible token with configurable supply and metadata</li>
-              <li>ERC-721 NFT — Non-fungible token with metadata URI support</li>
-              <li>ERC-1155 Multi-Token — Combined fungible and non-fungible standard</li>
-              <li>Staking Contract — Lock-and-earn staking with configurable reward rates</li>
-              <li>Multi-Signature Wallet — Multi-approval transaction execution</li>
-              <li>Token Vesting — Time-locked distribution for teams and investors</li>
+              <li>ERC-20 Token: Fungible token with configurable supply and metadata</li>
+              <li>ERC-721 NFT: Non-fungible token with metadata URI support</li>
+              <li>ERC-1155 Multi-Token: Combined fungible and non-fungible standard</li>
+              <li>Staking Contract: Lock-and-earn staking with configurable reward rates</li>
+              <li>Multi-Signature Wallet: Multi-approval transaction execution</li>
+              <li>Token Vesting: Time-locked distribution for teams and investors</li>
             </ul>
           </div>
         </div>
@@ -464,7 +467,7 @@ const sections: DocSection[] = [
         <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-3">
           <div>
             <p className="font-semibold text-foreground">Why Rialo</p>
-            <p>Low fees make DeFi interactions economically viable for all users, not just large holders. On high-fee chains, a small borrow or swap can cost more in gas than the transaction is worth. On Rialo, every interaction — from a $10 swap to a $100,000 supply — has a negligible transaction cost.</p>
+            <p>Low fees make DeFi interactions economically viable for all users, not just large holders. On high-fee chains, a small borrow or swap can cost more in gas than the transaction is worth. On Rialo, every interaction, from a $10 swap to a $100,000 supply, has a negligible transaction cost.</p>
           </div>
           <div>
             <p className="font-semibold text-foreground">RIA Token</p>
@@ -472,7 +475,7 @@ const sections: DocSection[] = [
           </div>
           <div>
             <p className="font-semibold text-foreground">Connecting to Rialo Testnet</p>
-            <p>Connect your wallet (MetaMask or WalletConnect) through ArcLend's interface. The app handles network configuration automatically. On testnet, all transactions after wallet connection are simulated — no gas fees or signing prompts.</p>
+            <p>Connect your wallet (MetaMask or WalletConnect) through ArcLend's interface. The app handles network configuration automatically. On testnet, all transactions after wallet connection are simulated with no gas fees or signing prompts.</p>
           </div>
         </div>
       </div>
@@ -485,19 +488,19 @@ const sections: DocSection[] = [
     content: (
       <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
         <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-2">
-          <p><strong className="text-foreground">APY (Annual Percentage Yield)</strong> — The annualized return on a deposit or staking position, including compounding.</p>
-          <p><strong className="text-foreground">TVL (Total Value Locked)</strong> — The total dollar value of assets deposited in a protocol's contracts.</p>
-          <p><strong className="text-foreground">LTV (Loan-to-Value)</strong> — The maximum percentage of collateral value that can be borrowed.</p>
-          <p><strong className="text-foreground">Health Factor</strong> — A ratio indicating borrow position safety. Below 1.0, the position can be liquidated.</p>
-          <p><strong className="text-foreground">Liquidation</strong> — The process of closing an undercollateralized position. The liquidator repays debt and receives collateral at a discount.</p>
-          <p><strong className="text-foreground">nTokens</strong> — Interest-bearing receipt tokens issued to suppliers, representing deposit plus accrued interest.</p>
-          <p><strong className="text-foreground">vDebt Tokens</strong> — Non-transferable tokens tracking a borrower's outstanding obligation, including accrued interest.</p>
-          <p><strong className="text-foreground">AMM (Automated Market Maker)</strong> — A contract that prices and executes token swaps using pooled liquidity and a mathematical formula.</p>
-          <p><strong className="text-foreground">Impermanent Loss</strong> — The value difference between holding tokens vs. providing them as liquidity, caused by relative price changes.</p>
-          <p><strong className="text-foreground">Slippage</strong> — The difference between quoted and executed trade price, caused by pool reserve changes.</p>
-          <p><strong className="text-foreground">Reserve Factor</strong> — The percentage of borrower interest kept by the protocol treasury.</p>
-          <p><strong className="text-foreground">Utilization Rate</strong> — The percentage of supplied assets currently being borrowed. Higher utilization raises interest rates.</p>
-          <p><strong className="text-foreground">LP Tokens</strong> — Tokens representing your share of a liquidity pool. Burn them to withdraw your share plus earned fees.</p>
+          <p><strong className="text-foreground">APY (Annual Percentage Yield)</strong>: The annualized return on a deposit or staking position, including compounding.</p>
+          <p><strong className="text-foreground">TVL (Total Value Locked)</strong>: The total dollar value of assets deposited in a protocol's contracts.</p>
+          <p><strong className="text-foreground">LTV (Loan-to-Value)</strong>: The maximum percentage of collateral value that can be borrowed.</p>
+          <p><strong className="text-foreground">Health Factor</strong>: A ratio indicating borrow position safety. Below 1.0, the position can be liquidated.</p>
+          <p><strong className="text-foreground">Liquidation</strong>: The process of closing an undercollateralized position. The liquidator repays debt and receives collateral at a discount.</p>
+          <p><strong className="text-foreground">nTokens</strong>: Interest-bearing receipt tokens issued to suppliers, representing deposit plus accrued interest.</p>
+          <p><strong className="text-foreground">vDebt Tokens</strong>: Non-transferable tokens tracking a borrower's outstanding obligation, including accrued interest.</p>
+          <p><strong className="text-foreground">AMM (Automated Market Maker)</strong>: A contract that prices and executes token swaps using pooled liquidity and a mathematical formula.</p>
+          <p><strong className="text-foreground">Impermanent Loss</strong>: The value difference between holding tokens vs. providing them as liquidity, caused by relative price changes.</p>
+          <p><strong className="text-foreground">Slippage</strong>: The difference between quoted and executed trade price, caused by pool reserve changes.</p>
+          <p><strong className="text-foreground">Reserve Factor</strong>: The percentage of borrower interest kept by the protocol treasury.</p>
+          <p><strong className="text-foreground">Utilization Rate</strong>: The percentage of supplied assets currently being borrowed. Higher utilization raises interest rates.</p>
+          <p><strong className="text-foreground">LP Tokens</strong>: Tokens representing your share of a liquidity pool. Burn them to withdraw your share plus earned fees.</p>
         </div>
       </div>
     ),
