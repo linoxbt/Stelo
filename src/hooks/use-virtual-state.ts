@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
-// Token prices (simulated with ±1% fluctuation)
+// Token prices (simulated with plus/minus 1% fluctuation)
 export const BASE_PRICES: Record<string, number> = {
   RIA: 0.50,
   WETH: 2000,
@@ -72,7 +72,7 @@ export interface VirtualState {
   lpPositions: LPPosition[];
   staking: StakingPosition[];
   stakingPendingWithdrawals: { amount: number; availableAt: number }[];
-  faucetCooldowns: Record<string, number>; // token -> last claim timestamp
+  faucetCooldowns: Record<string, number>;
   transactions: VirtualTx[];
   alertSettings: {
     at15: boolean;
@@ -152,7 +152,7 @@ export function useVirtualState(address: string | undefined) {
       setPrices((prev) => {
         const next = { ...prev };
         for (const key of Object.keys(BASE_PRICES)) {
-          const fluctuation = 1 + (Math.random() - 0.5) * 0.02; // ±1%
+          const fluctuation = 1 + (Math.random() - 0.5) * 0.02;
           next[key] = BASE_PRICES[key] * fluctuation;
         }
         return next;
@@ -180,7 +180,11 @@ export function useVirtualState(address: string | undefined) {
     []
   );
 
-  // Faucetst >= FAUCET_COOLDOWN_MS;
+  // Faucet
+  const canClaim = useCallback(
+    (token: string) => {
+      const last = state.faucetCooldowns[token] || 0;
+      return Date.now() - last >= FAUCET_COOLDOWN_MS;
     },
     [state.faucetCooldowns]
   );
@@ -215,9 +219,13 @@ export function useVirtualState(address: string | undefined) {
     [canClaim, addTx]
   );
 
-  // ─── Supply ─SupplyeCallback(
-   Supplyumber, apy: nuSupplyt <= 0 || (staSupply amount) returSupplyrev) => ({
-   Supplynces: { ...preSupply.balances[asset] || 0) - amount },
+  // Supply
+  const supply = useCallback(
+    (asset: string, amount: number, apy: number) => {
+      if (amount <= 0 || (state.balances[asset] || 0) < amount) return false;
+      setState((prev) => ({
+        ...prev,
+        balances: { ...prev.balances, [asset]: (prev.balances[asset] || 0) - amount },
         supplies: [...prev.supplies, { asset, amount, apy, timestamp: Date.now() }],
       }));
       addTx("supply", asset, amount);
@@ -230,7 +238,6 @@ export function useVirtualState(address: string | undefined) {
     (index: number) => {
       const pos = state.supplies[index];
       if (!pos) return false;
-      // Calculate interest earned
       const elapsed = (Date.now() - pos.timestamp) / (365.25 * 24 * 60 * 60 * 1000);
       const interest = pos.amount * (pos.apy / 100) * elapsed;
       const total = pos.amount + interest;
@@ -245,11 +252,15 @@ export function useVirtualState(address: string | undefined) {
     [state.supplies, addTx]
   );
 
-  // ─── Borrow ───
-  const borroBorrowt: string, amount: number, apy: nuBorrowt <= 0) return false;
-      // CheBorrowonst collateralValue = state.supplBorrows) => sum + s.amount * (prices[s.aBorrow  0
+  // Borrow
+  const borrow = useCallback(
+    (asset: string, amount: number, apy: number) => {
+      if (amount <= 0) return false;
+      const collateralValue = state.supplies.reduce(
+        (sum, s) => sum + s.amount * (prices[s.asset] || 0) * 0.75,
+        0
       );
-      const currentDeBorrow
+      const currentDebt = state.borrows.reduce(
         (sum, b) => sum + b.amount * (prices[b.asset] || 0),
         0
       );
@@ -286,13 +297,14 @@ export function useVirtualState(address: string | undefined) {
     [state.borrows, state.balances, addTx]
   );
 
-  // ─── Swap ───
+  // Swap
   const swap = useCallback(
-    (frSwap: string, fromAmount: number) => {
-      if (fromAmount SwapfromToken] || 0) < fromAmount) return false;
-      constSwapToken] || 0;
-      const toPrice = prices[toToken] || 0;Swap) return false;
-      const toAmount = (fromAmount * froSwap7; // 0.3% fee
+    (fromToken: string, toToken: string, fromAmount: number) => {
+      if (fromAmount <= 0 || (state.balances[fromToken] || 0) < fromAmount) return false;
+      const fromPrice = prices[fromToken] || 0;
+      const toPrice = prices[toToken] || 0;
+      if (toPrice === 0) return false;
+      const toAmount = (fromAmount * fromPrice) / toPrice * 0.997; // 0.3% fee
       setState((prev) => ({
         ...prev,
         balances: {
@@ -301,21 +313,23 @@ export function useVirtualState(address: string | undefined) {
           [toToken]: (prev.balances[toToken] || 0) + toAmount,
         },
       }));
-      addTx("swap", `${fromToken}→${toToken}`, fromAmount);
+      addTx("swap", `${fromToken}>${toToken}`, fromAmount);
       return toAmount;
     },
     [state.balances, prices, addTx]
   );
 
-  // ─── Staking ───
-  const APY_MULTIPLIERS: Record<number, number> = { Staking0: 2, 365: 3 };
+  // Staking
+  const APY_MULTIPLIERS: Record<number, number> = { 0: 1, 30: 1.25, 90: 1.5, 180: 2, 365: 3 };
   const BASE_STAKING_APY = 4;
 
-  const stake = useCallbacStakingkDays: number) => {
-      if (amount <= 0 || (state.balances.ALND || 0) <Staking  const now = Date.now();
+  const stake = useCallback(
+    (amount: number, lockDays: number) => {
+      if (amount <= 0 || (state.balances.ALND || 0) < amount) return false;
+      const now = Date.now();
       setState((prev) => ({
         ...prev,
-  Stakingalances, ALND: (prev.balances.ALND || 0) - amount },
+        balances: { ...prev.balances, ALND: (prev.balances.ALND || 0) - amount },
         staking: [
           ...prev.staking,
           {
@@ -400,20 +414,27 @@ export function useVirtualState(address: string | undefined) {
     [state.staking, getStakingRewards, addTx]
   );
 
-  // ─── Health Factor ───
+  // Health Factor
   const calculateHealthFactor = useCallback(() => {
-    const collHealth Factorce(
-      (sum, s) => sum + s.amount * (prices[s.asset] || 0) * 0.80, // liquidation thHealth FactordebtValue = state.borrows.reduce(
-      (sum, b) => sum + b.amount * (prices[b.asset] |Health FactorValue === 0) return Infinity;
+    const collateralValue = state.supplies.reduce(
+      (sum, s) => sum + s.amount * (prices[s.asset] || 0) * 0.80,
+      0
+    );
+    const debtValue = state.borrows.reduce(
+      (sum, b) => sum + b.amount * (prices[b.asset] || 0),
+      0
+    );
+    if (debtValue === 0) return Infinity;
     return collateralValue / debtValue;
   }, [state.supplies, state.borrows, prices]);
 
-  // ─── LP ───
+  // LP
   const addLiquidity = useCallback(
-    (tokenA: string, tokenB: string, amountA: number, amountBLPf (
+    (tokenA: string, tokenB: string, amountA: number, amountB: number) => {
+      if (
         amountA <= 0 || amountB <= 0 ||
         (state.balances[tokenA] || 0) < amountA ||
-        (state.balancesLPtB
+        (state.balances[tokenB] || 0) < amountB
       ) return false;
       const lpTokens = Math.sqrt(amountA * amountB);
       setState((prev) => ({
@@ -438,7 +459,6 @@ export function useVirtualState(address: string | undefined) {
     (index: number) => {
       const pos = state.lpPositions[index];
       if (!pos) return false;
-      // Return tokens + simulated fees (0.5% bonus)
       setState((prev) => ({
         ...prev,
         balances: {
@@ -454,10 +474,11 @@ export function useVirtualState(address: string | undefined) {
     [state.lpPositions, addTx]
   );
 
-  // ─── Alert Settings ───
+  // Alert Settings
   const updateAlertSettings = useCallback(
     (settings: Partial<VirtualState["alertSettings"]>) => {
-  Alert Settings...prev,
+      setState((prev) => ({
+        ...prev,
         alertSettings: { ...prev.alertSettings, ...settings },
       }));
     },
@@ -467,18 +488,14 @@ export function useVirtualState(address: string | undefined) {
   return {
     state,
     prices,
-    // Faucet
     canClaim,
     getClaimCooldown,
     claimFaucet,
-    // Lending
     supply,
     withdraw,
     borrow,
     repay,
-    // Swap
     swap,
-    // Staking
     stake,
     unstake,
     claimPendingWithdrawals,
@@ -486,14 +503,10 @@ export function useVirtualState(address: string | undefined) {
     claimStakingRewards,
     stakingAPY: BASE_STAKING_APY,
     apyMultipliers: APY_MULTIPLIERS,
-    // Health
     calculateHealthFactor,
-    // LP
     addLiquidity,
     removeLiquidity,
-    // Alerts
     updateAlertSettings,
-    // Helpers
     addTx,
   };
 }
