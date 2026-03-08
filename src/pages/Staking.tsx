@@ -214,7 +214,7 @@ export default function Staking() {
                           <p className="text-xs text-muted-foreground">{pos.lockDays === 0 ? "Flexible" : `${pos.lockDays}-day lock`}</p>
                           {isLocked && (
                             <p className="text-xs text-orange-500 flex items-center gap-1 mt-1">
-                              <Lock className="h-3 w-3" /> Locked — {formatTime(remaining)}
+                              <Lock className="h-3 w-3" /> Locked: {formatTime(remaining)}
                             </p>
                           )}
                         </div>

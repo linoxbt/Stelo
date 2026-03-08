@@ -57,7 +57,7 @@ export default function Swap() {
   const estimatedOutput = fromAmount && fromPrice && toPrice
     ? ((parseFloat(fromAmount) * fromPrice) / toPrice * 0.997).toFixed(4)
     : "";
-  const rate = fromPrice && toPrice ? (fromPrice / toPrice).toFixed(4) : "—";
+  const rate = fromPrice && toPrice ? (fromPrice / toPrice).toFixed(4) : "--";
   const fromBalance = vs.state.balances[fromToken] || 0;
 
   return (

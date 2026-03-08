@@ -61,7 +61,7 @@ export default function Dashboard() {
   );
 
   const hf = calculateHealthFactor();
-  const hfDisplay = hf === Infinity ? "—" : hf.toFixed(2);
+  const hfDisplay = hf === Infinity ? "--" : hf.toFixed(2);
   const hfColor = hf === Infinity ? "text-muted-foreground" : hf >= 2 ? "text-green-500" : hf >= 1.5 ? "text-yellow-500" : hf >= 1.2 ? "text-orange-500" : "text-red-500";
 
   if (!connected) {

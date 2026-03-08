@@ -150,7 +150,7 @@ export default function Liquidity() {
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="border-border bg-card">
           <DialogHeader>
-            <DialogTitle className="text-foreground">Add Liquidity — {selectedPool?.tokenA}/{selectedPool?.tokenB}</DialogTitle>
+            <DialogTitle className="text-foreground">Add Liquidity: {selectedPool?.tokenA}/{selectedPool?.tokenB}</DialogTitle>
             <DialogDescription className="text-muted-foreground">Provide tokens to earn trading fees</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
