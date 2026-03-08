@@ -180,8 +180,7 @@ export function useVirtualState(address: string | undefined) {
     []
   );
 
-  // FaucetuseCallback(
-    (token: string) => {
+  // Faucetken: string) => {
       const last = state.faucetCooldowns[token] || 0;
       return Date.now() - last >= FAUCET_COOLDOWN_MS;
     },
@@ -219,7 +218,7 @@ export function useVirtualState(address: string | undefined) {
   );
 
   // ─── Supply ─SupplyeCallback(
-    (asset: string, amount: number, apy: number) => {
+   Supplyumber, apy: number) => {
       if (amount <= 0 || (state.balances[asset] || 0) < amount) return false;
       setState((prev) => ({
         ...prev,
@@ -252,8 +251,7 @@ export function useVirtualState(address: string | undefined) {
   );
 
   // ─── Borrow ───
-  const borrow = useCallback(
-    (asset: string, amount: number, apy: number) => {
+  const borroBorrowt: string, amount: number, apy: number) => {
       if (amount <= 0) return false;
       // Check borrowing power
       const collateralValue = state.supplies.reduce(
