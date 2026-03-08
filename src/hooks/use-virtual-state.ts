@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
-// ─── Token prices (simulated with ±1% fluctuation) ───
+// Token prices (simulated with ±1% fluctuation)
 export const BASE_PRICES: Record<string, number> = {
   RIA: 0.50,
   WETH: 2000,

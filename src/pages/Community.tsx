@@ -63,7 +63,7 @@ export default function Community() {
         <CardContent className="space-y-3">
           {[
             { title: "Proposal: Add support for more collateral types", author: "0x3f4a...8c21", replies: 12 },
-            { title: "ArcLend Testnet Launch — Feedback Thread", author: "0x7b2e...d4f9", replies: 34 },
+            { title: "ArcLend Testnet Launch - Feedback Thread", author: "0x7b2e...d4f9", replies: 34 },
             { title: "Feature request: Multi-chain deployment", author: "0x1c9d...a3e7", replies: 8 },
           ].map((thread, i) => (
             <div key={i} className="flex items-center justify-between rounded-lg border border-border bg-secondary/30 p-3">

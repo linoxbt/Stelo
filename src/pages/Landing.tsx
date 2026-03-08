@@ -61,7 +61,7 @@ export default function Landing() {
             </h1>
 
             <p className="mx-auto mb-10 max-w-xl text-base text-muted-foreground sm:text-lg">
-              Lend, borrow, swap, stake, and provide liquidity — all from one unified protocol on Rialo Network.
+              Lend, borrow, swap, stake, and provide liquidity. All from one unified protocol on Rialo Network.
             </p>
 
             <div className="mb-16 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
