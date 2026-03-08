@@ -180,8 +180,7 @@ export function useVirtualState(address: string | undefined) {
     []
   );
 
-  // Faucetken: string) => {
-      const last = state.faucetCooldowns[token] || 0;
+  // Faucet    const last = state.faucetCooldowns[token] || 0;
       return Date.now() - last >= FAUCET_COOLDOWN_MS;
     },
     [state.faucetCooldowns]
@@ -218,8 +217,7 @@ export function useVirtualState(address: string | undefined) {
   );
 
   // ─── Supply ─SupplyeCallback(
-   Supplyumber, apy: number) => {
-      if (amount <= 0 || (state.balances[asset] || 0) < amount) return false;
+   Supplyumber, apy: nuSupplyt <= 0 || (state.balances[asset] || 0) < amount) return false;
       setState((prev) => ({
         ...prev,
         balances: { ...prev.balances, [asset]: (prev.balances[asset] || 0) - amount },
@@ -251,8 +249,7 @@ export function useVirtualState(address: string | undefined) {
   );
 
   // ─── Borrow ───
-  const borroBorrowt: string, amount: number, apy: number) => {
-      if (amount <= 0) return false;
+  const borroBorrowt: string, amount: number, apy: nuBorrowt <= 0) return false;
       // Check borrowing power
       const collateralValue = state.supplies.reduce(
         (sum, s) => sum + s.amount * (prices[s.asset] || 0) * 0.75,
@@ -297,7 +294,7 @@ export function useVirtualState(address: string | undefined) {
 
   // ─── Swap ───
   const swap = useCallback(
-    (fromToken: string, toToken: string, fromAmount: number) => {
+    (frSwap: string, fromAmount: number) => {
       if (fromAmount <= 0 || (state.balances[fromToken] || 0) < fromAmount) return false;
       const fromPrice = prices[fromToken] || 0;
       const toPrice = prices[toToken] || 0;
