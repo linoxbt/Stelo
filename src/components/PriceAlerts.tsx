@@ -24,7 +24,7 @@ import { toast } from "sonner";
 import { TokenIcon } from "@/components/TokenIcon";
 import { usePriceAlertsDb } from "@/hooks/use-price-alerts-db";
 
-const TOKENS = ["RIA", "WETH", "USDT", "ALND"];
+const TOKENS = ["RLO", "WETH", "USDT", "ALND"];
 
 interface PriceAlertsProps {
   prices: Record<string, number>;

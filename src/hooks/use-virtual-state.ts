@@ -2,21 +2,21 @@ import { useState, useEffect, useCallback, useRef } from "react";
 
 // Token prices (simulated with plus/minus 1% fluctuation)
 export const BASE_PRICES: Record<string, number> = {
-  RIA: 0.50,
+  RLO: 0.50,
   WETH: 2000,
   USDT: 1.0,
   ALND: 10,
 };
 
 export const INITIAL_BALANCES: Record<string, number> = {
-  RIA: 100,
+  RLO: 100,
   WETH: 0,
   USDT: 0,
   ALND: 0,
 };
 
 export const FAUCET_AMOUNTS: Record<string, number> = {
-  RIA: 100,
+  RLO: 100,
   WETH: 1,
   USDT: 1000,
   ALND: 100,

@@ -28,7 +28,7 @@ export function useTokenPrices() {
         ETH: data.ethereum?.usd ?? FALLBACK.ETH,
         WETH: data.ethereum?.usd ?? FALLBACK.WETH,
         USDT: data.tether?.usd ?? FALLBACK.USDT,
-        RIA: FALLBACK.RIA, // RIA not on CoinGecko, use static
+        RLO: FALLBACK.RLO, // RLO not on CoinGecko, use static
       });
       setLastUpdated(new Date());
     } catch {

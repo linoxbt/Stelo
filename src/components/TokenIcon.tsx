@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 const TOKEN_IMAGES: Record<string, string> = {
-  RIA: "/assets/tokens/ria.png",
+  RLO: "/assets/tokens/rlo.png",
   WETH: "/assets/tokens/weth.png",
   USDT: "/assets/tokens/usdt.png",
   ALND: "/assets/tokens/alnd.png",

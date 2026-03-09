@@ -25,7 +25,7 @@ interface Asset {
 }
 
 const assets: Asset[] = [
-  { symbol: "RIA", name: "Rialo", supplyAPY: 3.5, borrowAPY: 5.2, collateralFactor: 75, liquidationThreshold: 80, totalLiquidity: "$85,000", utilization: 35 },
+  { symbol: "RLO", name: "Rialo", supplyAPY: 3.5, borrowAPY: 5.2, collateralFactor: 75, liquidationThreshold: 80, totalLiquidity: "$85,000", utilization: 35 },
   { symbol: "WETH", name: "Wrapped Ether", supplyAPY: 3.0, borrowAPY: 4.8, collateralFactor: 78, liquidationThreshold: 82, totalLiquidity: "$72,000", utilization: 40 },
   { symbol: "USDT", name: "Tether USD", supplyAPY: 4.5, borrowAPY: 6.5, collateralFactor: 75, liquidationThreshold: 80, totalLiquidity: "$195,000", utilization: 52 },
   { symbol: "ALND", name: "ArcLend Token", supplyAPY: 5.2, borrowAPY: 7.8, collateralFactor: 60, liquidationThreshold: 70, totalLiquidity: "$45,000", utilization: 28 },

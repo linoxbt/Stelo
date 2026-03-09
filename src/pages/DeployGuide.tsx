@@ -165,7 +165,7 @@ export default function DeployGuide() {
                 <span>Network</span><span className="text-foreground">Rialo Testnet</span>
               </div>
               <div className="flex justify-between">
-                <span>Estimated Gas</span><span className="text-foreground">~0.01 RIA</span>
+                <span>Estimated Gas</span><span className="text-foreground">~0.01 RLO</span>
               </div>
             </div>
 

@@ -22,7 +22,7 @@ interface Proposal {
 
 const proposals: Proposal[] = [
   { id: 1, title: "Increase WETH collateral factor to 82%", description: "Adjust the WETH collateral factor from 78% to 82% to improve capital efficiency.", status: "active", forVotes: 1250000, againstVotes: 320000, endDate: "3 days" },
-  { id: 2, title: "Add ALND/RIA liquidity pool", description: "Create a new ALND/RIA liquidity pool with 0.3% swap fee and 28% APR incentive.", status: "active", forVotes: 890000, againstVotes: 150000, endDate: "5 days" },
+  { id: 2, title: "Add ALND/RLO liquidity pool", description: "Create a new ALND/RLO liquidity pool with 0.3% swap fee and 28% APR incentive.", status: "active", forVotes: 890000, againstVotes: 150000, endDate: "5 days" },
   { id: 3, title: "Reduce liquidation penalty to 4%", description: "Lower the liquidation penalty from 5% to 4% to reduce cascading liquidations.", status: "passed", forVotes: 2100000, againstVotes: 450000, endDate: "Ended" },
   { id: 4, title: "Treasury grant for security audit", description: "Allocate 50,000 ALND from treasury for a comprehensive smart contract audit.", status: "passed", forVotes: 3200000, againstVotes: 100000, endDate: "Ended" },
 ];
