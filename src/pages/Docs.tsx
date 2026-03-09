@@ -418,9 +418,9 @@ const sections: DocSection[] = [
               <li>ALND: 100 tokens per claim</li>
             </ul>
           </div>
-          <div>
-            <p className="font-semibold text-foreground">Cooldown</p>
-            <p>Each token has a 24-hour cooldown per wallet address. Cooldowns are tracked independently. You can claim RIA even if WETH is still on cooldown. A countdown timer shows exactly when each token becomes claimable again.</p>
+           <div>
+             <p className="font-semibold text-foreground">Cooldown</p>
+             <p>Each token has a 24-hour cooldown per wallet address. Cooldowns are tracked independently. You can claim RLO even if WETH is still on cooldown. A countdown timer shows exactly when each token becomes claimable again.</p>
           </div>
           <div>
             <p className="font-semibold text-foreground">Claim All</p>
