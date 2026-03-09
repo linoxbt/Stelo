@@ -4,14 +4,14 @@ interface TokenPrices {
   ETH: number;
   WETH: number;
   USDT: number;
-  RIA: number;
+  RLO: number;
 }
 
 const COINGECKO_API = "https://api.coingecko.com/api/v3/simple/price";
 const IDS = "ethereum,tether";
 const VS = "usd";
 
-const FALLBACK: TokenPrices = { ETH: 2253.74, WETH: 2253.74, USDT: 0.99, RIA: 12.40 };
+const FALLBACK: TokenPrices = { ETH: 2253.74, WETH: 2253.74, USDT: 0.99, RLO: 12.40 };
 
 export function useTokenPrices() {
   const [prices, setPrices] = useState<TokenPrices>(FALLBACK);
