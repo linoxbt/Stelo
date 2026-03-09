@@ -217,7 +217,7 @@ const sections: DocSection[] = [
           <div>
             <p className="font-semibold text-foreground">How Swaps Work</p>
             <p>
-              The AMM uses the constant product formula (x * y = k). When you swap RIA for USDT, you add RIA to the pool and remove USDT. The exchange rate is determined by the pool's current reserves. Larger trades relative to pool size result in more slippage because you are changing the reserve ratio more dramatically.
+               The AMM uses the constant product formula (x * y = k). When you swap RLO for USDT, you add RLO to the pool and remove USDT. The exchange rate is determined by the pool's current reserves. Larger trades relative to pool size result in more slippage because you are changing the reserve ratio more dramatically.
             </p>
           </div>
           <div>
