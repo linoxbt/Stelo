@@ -17,8 +17,10 @@ import Liquidation from "./pages/Liquidation";
 import Community from "./pages/Community";
 import DeployGuide from "./pages/DeployGuide";
 import Docs from "./pages/Docs";
+import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";
 import { AIChatBot } from "./components/AIChatBot";
+import "@/lib/i18n";
 
 const App = () => (
   <Web3Provider>
@@ -42,6 +44,7 @@ const App = () => (
           <Route path="/community" element={<Community />} />
           <Route path="/deploy" element={<DeployGuide />} />
           <Route path="/docs" element={<Docs />} />
+          <Route path="/analytics" element={<Analytics />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

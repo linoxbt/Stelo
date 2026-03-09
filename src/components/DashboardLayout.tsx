@@ -4,6 +4,8 @@ import { AppSidebar } from "./AppSidebar";
 import { Footer } from "./Footer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ThemeToggle } from "./ThemeToggle";
+import { LanguageSwitcher } from "./LanguageSwitcher";
+import { MobileNav } from "./MobileNav";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const isMobile = useIsMobile();
@@ -37,12 +39,18 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               )}
               <span className="text-sm text-muted-foreground">ArcLend Protocol</span>
             </div>
-            {isMobile && <ThemeToggle />}
+            {isMobile && (
+              <div className="flex items-center gap-1">
+                <LanguageSwitcher />
+                <ThemeToggle />
+              </div>
+            )}
           </header>
-          <div className="dot-grid flex-1 p-4 md:p-6">{children}</div>
+          <div className="dot-grid flex-1 p-4 pb-20 md:p-6 md:pb-6">{children}</div>
         </main>
       </div>
       <Footer />
+      {isMobile && <MobileNav />}
     </div>
   );
 }

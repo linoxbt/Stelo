@@ -122,4 +122,13 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* RTL support for Arabic */
+[dir="rtl"] {
+  text-align: right;
 }
