@@ -50,6 +50,42 @@ export type Database = {
         }
         Relationships: []
       }
+      price_alerts: {
+        Row: {
+          condition: string
+          created_at: string
+          id: string
+          notified: boolean
+          target_price: number
+          token: string
+          triggered: boolean
+          updated_at: string
+          wallet_address: string
+        }
+        Insert: {
+          condition: string
+          created_at?: string
+          id?: string
+          notified?: boolean
+          target_price: number
+          token: string
+          triggered?: boolean
+          updated_at?: string
+          wallet_address: string
+        }
+        Update: {
+          condition?: string
+          created_at?: string
+          id?: string
+          notified?: boolean
+          target_price?: number
+          token?: string
+          triggered?: boolean
+          updated_at?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
