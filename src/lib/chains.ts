@@ -6,7 +6,7 @@ export const rialoTestnet = defineChain({
   nativeCurrency: {
     decimals: 18,
     name: "Rialo",
-    symbol: "RIA",
+    symbol: "RLO",
   },
   rpcUrls: {
     default: {

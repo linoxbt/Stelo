@@ -60,7 +60,7 @@ export default function DeployGuide() {
     await new Promise(r => setTimeout(r, 2000));
     toast({
       title: "Deployment Not Available",
-      description: "Connect to Rialo Network and ensure you have RIA for gas fees. Contract deployment coming soon.",
+      description: "Connect to Rialo Network and ensure you have RLO for gas fees. Contract deployment coming soon.",
     });
     setDeploying(false);
     setDeployOpen(false);
@@ -165,7 +165,7 @@ export default function DeployGuide() {
                 <span>Network</span><span className="text-foreground">Rialo Testnet</span>
               </div>
               <div className="flex justify-between">
-                <span>Estimated Gas</span><span className="text-foreground">~0.01 RIA</span>
+                <span>Estimated Gas</span><span className="text-foreground">~0.01 RLO</span>
               </div>
             </div>
 

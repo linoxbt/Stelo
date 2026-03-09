@@ -11,7 +11,7 @@ import { useVirtualState, FAUCET_AMOUNTS, FAUCET_COOLDOWN_MS } from "@/hooks/use
 import { TokenIcon } from "@/components/TokenIcon";
 
 const faucetTokens = [
-  { symbol: "RIA", name: "Rialo", description: "Native gas & utility token" },
+  { symbol: "RLO", name: "Rialo", description: "Native gas & utility token" },
   { symbol: "WETH", name: "Wrapped Ether", description: "Wrapped version of Ethereum" },
   { symbol: "USDT", name: "Tether USD", description: "Stablecoin pegged to USD" },
   { symbol: "ALND", name: "ArcLend Token", description: "Governance & staking token" },

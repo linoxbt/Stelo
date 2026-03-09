@@ -14,7 +14,7 @@ import { useVirtualState } from "@/hooks/use-virtual-state";
 import { TokenIcon } from "@/components/TokenIcon";
 
 const tokens = [
-  { symbol: "RIA", name: "Rialo" },
+  { symbol: "RLO", name: "Rialo" },
   { symbol: "WETH", name: "Wrapped Ether" },
   { symbol: "USDT", name: "Tether USD" },
   { symbol: "ALND", name: "ArcLend Token" },
@@ -25,7 +25,7 @@ export default function Swap() {
   const { address } = useAccount();
   const { toast } = useToast();
   const vs = useVirtualState(address);
-  const [fromToken, setFromToken] = useState("RIA");
+  const [fromToken, setFromToken] = useState("RLO");
   const [toToken, setToToken] = useState("USDT");
   const [fromAmount, setFromAmount] = useState("");
   const [slippage, setSlippage] = useState("0.5");

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import {
   BookOpen, BarChart3, ArrowLeftRight, Droplets, Coins, Shield, Rocket,
   Activity, Users, Gavel, Lock, ExternalLink, Target, Eye, Lightbulb,
-  Layers, HelpCircle, Wallet, Globe
+  Layers, HelpCircle, Wallet, Globe, Code2
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { DashboardLayout } from "@/components/DashboardLayout";
@@ -38,7 +38,7 @@ const sections: DocSection[] = [
         <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-2">
           <p className="font-semibold text-foreground">Supported Assets</p>
           <div className="space-y-1.5">
-            <p><strong className="text-foreground">RIA</strong>: Rialo's native gas and utility token. Accepted as collateral, used for swap pairs, and distributed through the testnet faucet.</p>
+            <p><strong className="text-foreground">RLO</strong>: Rialo's native gas and utility token. Accepted as collateral, used for swap pairs, and distributed through the testnet faucet.</p>
             <p><strong className="text-foreground">WETH</strong>: Wrapped Ether. A tokenized version of ETH conforming to the ERC-20 standard. Widely used as a trading pair and high-value collateral asset.</p>
             <p><strong className="text-foreground">USDT</strong>: Tether USD. A fiat-backed stablecoin pegged to the US dollar. Provides a stable unit of account for lending, borrowing, swaps, and liquidity provision.</p>
             <p><strong className="text-foreground">ALND</strong>: ArcLend's governance and staking token. Holders stake ALND to earn a share of protocol revenue and vote on proposals that shape the protocol's direction.</p>
@@ -60,7 +60,7 @@ const sections: DocSection[] = [
           The common workaround is forking an existing protocol and deploying it on the new chain. This rarely works well. Forked protocols arrive with assumptions about oracle infrastructure, governance participation, and liquidity depth that simply do not exist on a young network. The fork launches, attracts minimal liquidity, and stagnates because it was never designed to grow with the ecosystem it landed on.
         </p>
         <p>
-          Rialo Network faces this exact situation. It is a high-throughput, low-fee chain with a growing developer community, but it lacks a native DeFi layer that can serve as the foundation for financial applications. Users who hold RIA have no way to earn yield on it. Builders who want to integrate lending or swaps into their applications have no on-chain primitives to call.
+          Rialo Network faces this exact situation. It is a high-throughput, low-fee chain with a growing developer community, but it lacks a native DeFi layer that can serve as the foundation for financial applications. Users who hold RLO have no way to earn yield on it. Builders who want to integrate lending or swaps into their applications have no on-chain primitives to call.
         </p>
         <p>
           ArcLend exists to fill that gap, not as a fork dropped onto Rialo, but as a purpose-built protocol designed for the chain's fee structure, community, and roadmap. The goal is to be the first financial layer that makes Rialo a chain where capital is productive from day one.
@@ -182,7 +182,7 @@ const sections: DocSection[] = [
           <div>
             <p className="font-semibold text-foreground">Borrowing Against Collateral</p>
             <p>
-              Each asset has a 75% Loan-to-Value ratio. Supply $1,000 of RIA, and you can borrow up to $750 of any supported token. Borrowing creates vDebt tokens that track your growing obligation. Interest accrues continuously based on pool utilization.
+             Each asset has a 75% Loan-to-Value ratio. Supply $1,000 of RLO, and you can borrow up to $750 of any supported token. Borrowing creates vDebt tokens that track your growing obligation. Interest accrues continuously based on pool utilization.
             </p>
           </div>
           <div>
@@ -217,7 +217,7 @@ const sections: DocSection[] = [
           <div>
             <p className="font-semibold text-foreground">How Swaps Work</p>
             <p>
-              The AMM uses the constant product formula (x * y = k). When you swap RIA for USDT, you add RIA to the pool and remove USDT. The exchange rate is determined by the pool's current reserves. Larger trades relative to pool size result in more slippage because you are changing the reserve ratio more dramatically.
+               The AMM uses the constant product formula (x * y = k). When you swap RLO for USDT, you add RLO to the pool and remove USDT. The exchange rate is determined by the pool's current reserves. Larger trades relative to pool size result in more slippage because you are changing the reserve ratio more dramatically.
             </p>
           </div>
           <div>
@@ -226,12 +226,12 @@ const sections: DocSection[] = [
           </div>
           <div>
             <p className="font-semibold text-foreground">Available Pairs</p>
-            <p>RIA/USDT, RIA/WETH, USDT/WETH, ALND/USDT. Multi-hop routing is available when a direct pair does not exist.</p>
+            <p>RLO/USDT, RLO/WETH, USDT/WETH, ALND/USDT. Multi-hop routing is available when a direct pair does not exist.</p>
           </div>
           <div>
             <p className="font-semibold text-foreground">Why Swap Inside ArcLend?</p>
             <p>
-              Having swaps within the protocol means users do not need to leave the platform to rebalance their portfolio. Need more USDT to repay a borrow position? Swap RIA for USDT and repay, all in one session. This composability between swap, lending, and staking reduces friction and keeps capital circulating within the ecosystem.
+              Having swaps within the protocol means users do not need to leave the platform to rebalance their portfolio. Need more USDT to repay a borrow position? Swap RLO for USDT and repay, all in one session. This composability between swap, lending, and staking reduces friction and keeps capital circulating within the ecosystem.
             </p>
           </div>
         </div>
@@ -251,7 +251,7 @@ const sections: DocSection[] = [
           <div>
             <p className="font-semibold text-foreground">Adding Liquidity</p>
             <p>
-              You deposit two tokens in equal dollar value. For example, $500 of RIA and $500 of USDT into the RIA/USDT pool. In return, you receive LP tokens representing your proportional share of the pool. As trades flow through the pool, fees accumulate and increase the value of your LP tokens.
+              You deposit two tokens in equal dollar value. For example, $500 of RLO and $500 of USDT into the RLO/USDT pool. In return, you receive LP tokens representing your proportional share of the pool. As trades flow through the pool, fees accumulate and increase the value of your LP tokens.
             </p>
           </div>
           <div>
@@ -336,8 +336,8 @@ const sections: DocSection[] = [
         <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-3">
           <div>
             <p className="font-semibold text-foreground">Calculation</p>
-            <p>Health Factor = (Total Collateral Value x Liquidation Threshold) / Total Debt Value</p>
-            <p className="mt-2">Example: $1,000 of RIA supplied (80% liquidation threshold) and $400 of USDT borrowed gives HF = ($1,000 x 0.80) / $400 = 2.0. That is a comfortable position.</p>
+             <p>Health Factor = (Total Collateral Value x Liquidation Threshold) / Total Debt Value</p>
+             <p className="mt-2">Example: $1,000 of RLO supplied (80% liquidation threshold) and $400 of USDT borrowed gives HF = ($1,000 x 0.80) / $400 = 2.0. That is a comfortable position.</p>
           </div>
           <div>
             <p className="font-semibold text-foreground">Risk Levels</p>
@@ -412,15 +412,15 @@ const sections: DocSection[] = [
           <div>
             <p className="font-semibold text-foreground">Claim Amounts</p>
             <ul className="list-inside list-disc space-y-1">
-              <li>RIA: 100 tokens per claim</li>
+              <li>RLO: 100 tokens per claim</li>
               <li>WETH: 1 token per claim</li>
               <li>USDT: 1,000 tokens per claim</li>
               <li>ALND: 100 tokens per claim</li>
             </ul>
           </div>
-          <div>
-            <p className="font-semibold text-foreground">Cooldown</p>
-            <p>Each token has a 24-hour cooldown per wallet address. Cooldowns are tracked independently. You can claim RIA even if WETH is still on cooldown. A countdown timer shows exactly when each token becomes claimable again.</p>
+           <div>
+             <p className="font-semibold text-foreground">Cooldown</p>
+             <p>Each token has a 24-hour cooldown per wallet address. Cooldowns are tracked independently. You can claim RLO even if WETH is still on cooldown. A countdown timer shows exactly when each token becomes claimable again.</p>
           </div>
           <div>
             <p className="font-semibold text-foreground">Claim All</p>
@@ -469,13 +469,78 @@ const sections: DocSection[] = [
             <p className="font-semibold text-foreground">Why Rialo</p>
             <p>Low fees make DeFi interactions economically viable for all users, not just large holders. On high-fee chains, a small borrow or swap can cost more in gas than the transaction is worth. On Rialo, every interaction, from a $10 swap to a $100,000 supply, has a negligible transaction cost.</p>
           </div>
-          <div>
-            <p className="font-semibold text-foreground">RIA Token</p>
-            <p>RIA is Rialo's native gas token. On ArcLend, it is also accepted as collateral in lending pools, used as a base pair for swaps, and distributed through the testnet faucet.</p>
+           <div>
+             <p className="font-semibold text-foreground">RLO Token</p>
+             <p>RLO is Rialo's native gas token. On ArcLend, it is also accepted as collateral in lending pools, used as a base pair for swaps, and distributed through the testnet faucet.</p>
           </div>
           <div>
             <p className="font-semibold text-foreground">Connecting to Rialo Testnet</p>
             <p>Connect your wallet (MetaMask or WalletConnect) through ArcLend's interface. The app handles network configuration automatically. On testnet, all transactions after wallet connection are simulated with no gas fees or signing prompts.</p>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "techstack",
+    icon: <Code2 className="h-4 w-4" />,
+    title: "Technology Stack",
+    content: (
+      <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
+        <p>
+          ArcLend is built with a modern, production-grade technology stack optimized for performance, developer experience, and Web3 integration.
+        </p>
+        <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-3">
+          <div>
+            <p className="font-semibold text-foreground">Frontend Framework</p>
+            <p><strong className="text-foreground">React 18</strong> with <strong className="text-foreground">TypeScript</strong> — component-based architecture with full type safety. Vite serves as the build tool for instant HMR and optimized production bundles.</p>
+          </div>
+          <div>
+            <p className="font-semibold text-foreground">Styling & UI</p>
+            <p><strong className="text-foreground">Tailwind CSS</strong> for utility-first styling with a custom design system. <strong className="text-foreground">shadcn/ui</strong> provides accessible, composable primitives built on Radix UI. <strong className="text-foreground">Framer Motion</strong> powers all animations and transitions.</p>
+          </div>
+          <div>
+            <p className="font-semibold text-foreground">Web3 Integration</p>
+            <p><strong className="text-foreground">wagmi</strong> and <strong className="text-foreground">viem</strong> for type-safe Ethereum interactions. <strong className="text-foreground">RainbowKit</strong> provides a polished wallet connection UI supporting MetaMask, WalletConnect, and other popular wallets.</p>
+          </div>
+          <div>
+            <p className="font-semibold text-foreground">Backend & Data</p>
+            <p><strong className="text-foreground">Supabase</strong> (via Lovable Cloud) handles database persistence, edge functions for notification dispatch (email & Telegram), and real-time subscriptions. <strong className="text-foreground">TanStack Query</strong> manages server state with caching and automatic refetching.</p>
+          </div>
+          <div>
+            <p className="font-semibold text-foreground">Data Visualization</p>
+            <p><strong className="text-foreground">Recharts</strong> for portfolio analytics, yield curves, and P&L charts. Built on D3.js with a React-native API for responsive, interactive charting.</p>
+          </div>
+          <div>
+            <p className="font-semibold text-foreground">Internationalization</p>
+            <p><strong className="text-foreground">i18next</strong> with <strong className="text-foreground">react-i18next</strong> for multi-language support. Currently supports English, Spanish, Chinese, and Arabic with browser-based language detection.</p>
+          </div>
+          <div>
+            <p className="font-semibold text-foreground">Routing & State</p>
+            <p><strong className="text-foreground">React Router v6</strong> for client-side navigation. Local state is persisted to <strong className="text-foreground">localStorage</strong> per wallet address for virtual simulation state. Database-backed state for alerts and notification preferences.</p>
+          </div>
+          <div>
+            <p className="font-semibold text-foreground">Testing & Quality</p>
+            <p><strong className="text-foreground">Vitest</strong> for unit and integration testing. <strong className="text-foreground">ESLint</strong> with TypeScript rules for code quality enforcement. Fully typed with strict TypeScript configuration.</p>
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-secondary/30 p-4 space-y-2">
+          <p className="font-semibold text-foreground">Key Libraries</p>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+            <p>• React 18 + TypeScript</p>
+            <p>• Vite (build tool)</p>
+            <p>• Tailwind CSS</p>
+            <p>• shadcn/ui + Radix UI</p>
+            <p>• Framer Motion</p>
+            <p>• wagmi + viem</p>
+            <p>• RainbowKit</p>
+            <p>• Supabase JS</p>
+            <p>• TanStack Query</p>
+            <p>• Recharts</p>
+            <p>• i18next</p>
+            <p>• React Router v6</p>
+            <p>• Zod (validation)</p>
+            <p>• Sonner (toasts)</p>
           </div>
         </div>
       </div>

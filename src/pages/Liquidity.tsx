@@ -23,8 +23,8 @@ interface Pool {
 }
 
 const pools: Pool[] = [
-  { tokenA: "RIA", tokenB: "USDT", tvl: "$245,000", volume24h: "$12,500", apr: "24.5%" },
-  { tokenA: "RIA", tokenB: "WETH", tvl: "$180,000", volume24h: "$8,200", apr: "18.2%" },
+  { tokenA: "RLO", tokenB: "USDT", tvl: "$245,000", volume24h: "$12,500", apr: "24.5%" },
+  { tokenA: "RLO", tokenB: "WETH", tvl: "$180,000", volume24h: "$8,200", apr: "18.2%" },
   { tokenA: "USDT", tokenB: "WETH", tvl: "$320,000", volume24h: "$15,800", apr: "15.8%" },
   { tokenA: "ALND", tokenB: "USDT", tvl: "$95,000", volume24h: "$4,200", apr: "32.1%" },
 ];
