@@ -226,7 +226,7 @@ const sections: DocSection[] = [
           </div>
           <div>
             <p className="font-semibold text-foreground">Available Pairs</p>
-            <p>RIA/USDT, RIA/WETH, USDT/WETH, ALND/USDT. Multi-hop routing is available when a direct pair does not exist.</p>
+            <p>RLO/USDT, RLO/WETH, USDT/WETH, ALND/USDT. Multi-hop routing is available when a direct pair does not exist.</p>
           </div>
           <div>
             <p className="font-semibold text-foreground">Why Swap Inside ArcLend?</p>
