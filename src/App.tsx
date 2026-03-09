@@ -43,7 +43,6 @@ const App = () => {
         <Toaster />
         <Sonner />
         <AIChatBot />
-        <OnboardingTour />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
@@ -63,6 +62,7 @@ const App = () => {
             <Route path="/analytics" element={<Analytics />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <OnboardingTour />
         </BrowserRouter>
       </TooltipProvider>
     </Web3Provider>
