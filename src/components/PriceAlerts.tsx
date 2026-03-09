@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Bell, BellRing, Plus, Trash2 } from "lucide-react";
+import { Bell, BellRing, Plus, Trash2, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,16 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { TokenIcon } from "@/components/TokenIcon";
-import { supabase } from "@/integrations/supabase/client";
-
-interface PriceAlert {
-  id: string;
-  token: string;
-  condition: "above" | "below";
-  targetPrice: number;
-  createdAt: number;
-  triggered: boolean;
-}
+import { usePriceAlertsDb } from "@/hooks/use-price-alerts-db";
 
 const TOKENS = ["RIA", "WETH", "USDT", "ALND"];
 
@@ -42,81 +33,53 @@ interface PriceAlertsProps {
 
 export function PriceAlerts({ prices, walletAddress }: PriceAlertsProps) {
   const { t } = useTranslation();
-  const [alerts, setAlerts] = useState<PriceAlert[]>([]);
+  const { alerts, loading, createAlert, deleteAlert } = usePriceAlertsDb(
+    walletAddress,
+    prices
+  );
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [newAlert, setNewAlert] = useState({
     token: "WETH",
     condition: "above" as "above" | "below",
     targetPrice: "",
   });
 
-  // Load alerts from localStorage
-  useEffect(() => {
-    if (!walletAddress) return;
-    const key = `arclend_alerts_${walletAddress.toLowerCase()}`;
-    const stored = localStorage.getItem(key);
-    if (stored) {
-      try {
-        setAlerts(JSON.parse(stored));
-      } catch {}
-    }
-  }, [walletAddress]);
-
-  // Save alerts to localStorage
-  useEffect(() => {
-    if (!walletAddress) return;
-    const key = `arclend_alerts_${walletAddress.toLowerCase()}`;
-    localStorage.setItem(key, JSON.stringify(alerts));
-  }, [alerts, walletAddress]);
-
-  // Check alerts against current prices
-  useEffect(() => {
-    alerts.forEach((alert) => {
-      if (alert.triggered) return;
-      const currentPrice = prices[alert.token] || 0;
-      const shouldTrigger =
-        (alert.condition === "above" && currentPrice >= alert.targetPrice) ||
-        (alert.condition === "below" && currentPrice <= alert.targetPrice);
-
-      if (shouldTrigger) {
-        setAlerts((prev) =>
-          prev.map((a) => (a.id === alert.id ? { ...a, triggered: true } : a))
-        );
-        toast.success(t("alertTriggered"), {
-          description: `${alert.token} ${t("currentPrice")}: $${currentPrice.toFixed(2)} (${t("targetPrice")}: $${alert.targetPrice})`,
-          icon: <BellRing className="h-4 w-4" />,
-        });
-      }
-    });
-  }, [prices, alerts, t]);
-
-  const handleCreateAlert = () => {
+  const handleCreateAlert = async () => {
     const targetPrice = parseFloat(newAlert.targetPrice);
     if (isNaN(targetPrice) || targetPrice <= 0) return;
 
-    const alert: PriceAlert = {
-      id: crypto.randomUUID(),
-      token: newAlert.token,
-      condition: newAlert.condition,
-      targetPrice,
-      createdAt: Date.now(),
-      triggered: false,
-    };
+    setCreating(true);
+    const result = await createAlert(newAlert.token, newAlert.condition, targetPrice);
+    setCreating(false);
 
-    setAlerts((prev) => [...prev, alert]);
-    setDialogOpen(false);
-    setNewAlert({ token: "WETH", condition: "above", targetPrice: "" });
-    toast.success(t("alertCreated"), {
-      description: `${alert.token} ${alert.condition === "above" ? t("priceAbove") : t("priceBelow")} $${targetPrice}`,
-    });
+    if (result) {
+      setDialogOpen(false);
+      setNewAlert({ token: "WETH", condition: "above", targetPrice: "" });
+      toast.success(t("alertCreated"), {
+        description: `${newAlert.token} ${newAlert.condition === "above" ? t("priceAbove") : t("priceBelow")} $${targetPrice}`,
+      });
+    } else {
+      toast.error("Failed to create alert");
+    }
   };
 
-  const handleDeleteAlert = (id: string) => {
-    setAlerts((prev) => prev.filter((a) => a.id !== id));
+  const handleDeleteAlert = async (id: string) => {
+    await deleteAlert(id);
   };
 
   const activeAlerts = alerts.filter((a) => !a.triggered);
   const triggeredAlerts = alerts.filter((a) => a.triggered);
+
+  if (loading) {
+    return (
+      <Card className="border-border bg-card">
+        <CardContent className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border-border bg-card">
@@ -187,8 +150,15 @@ export function PriceAlerts({ prices, walletAddress }: PriceAlertsProps) {
                   placeholder={`${t("currentPrice")}: $${(prices[newAlert.token] || 0).toFixed(2)}`}
                 />
               </div>
-              <Button onClick={handleCreateAlert} className="w-full">
-                {t("setAlert")}
+              <Button onClick={handleCreateAlert} className="w-full" disabled={creating}>
+                {creating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  t("setAlert")
+                )}
               </Button>
             </div>
           </DialogContent>
@@ -218,7 +188,7 @@ export function PriceAlerts({ prices, walletAddress }: PriceAlertsProps) {
                 <div>
                   <p className="text-xs font-medium text-foreground">
                     {alert.token} {alert.condition === "above" ? "↑" : "↓"} $
-                    {alert.targetPrice.toFixed(2)}
+                    {Number(alert.target_price).toFixed(2)}
                   </p>
                   <p className="text-[10px] text-muted-foreground">
                     {t("currentPrice")}: ${(prices[alert.token] || 0).toFixed(2)}
@@ -247,9 +217,11 @@ export function PriceAlerts({ prices, walletAddress }: PriceAlertsProps) {
                 <div>
                   <p className="text-xs font-medium text-foreground">
                     {alert.token} {alert.condition === "above" ? "↑" : "↓"} $
-                    {alert.targetPrice.toFixed(2)}
+                    {Number(alert.target_price).toFixed(2)}
                   </p>
-                  <p className="text-[10px] text-primary">{t("alertTriggered")}</p>
+                  <p className="text-[10px] text-primary">
+                    {t("alertTriggered")} {alert.notified && "• Notified ✓"}
+                  </p>
                 </div>
               </div>
               <Button
