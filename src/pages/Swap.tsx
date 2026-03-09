@@ -14,7 +14,7 @@ import { useVirtualState } from "@/hooks/use-virtual-state";
 import { TokenIcon } from "@/components/TokenIcon";
 
 const tokens = [
-  { symbol: "RIA", name: "Rialo" },
+  { symbol: "RLO", name: "Rialo" },
   { symbol: "WETH", name: "Wrapped Ether" },
   { symbol: "USDT", name: "Tether USD" },
   { symbol: "ALND", name: "ArcLend Token" },
