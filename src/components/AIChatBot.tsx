@@ -138,7 +138,7 @@ export function AIChatBot() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
-            className="fixed bottom-6 right-6 z-50"
+            className="fixed bottom-20 right-6 z-50 md:bottom-6"
           >
             <Button
               size="icon"
@@ -159,7 +159,7 @@ export function AIChatBot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-6 right-6 z-50 flex h-[500px] w-[380px] max-w-[calc(100vw-48px)] flex-col rounded-2xl border border-border bg-card shadow-2xl"
+            className="fixed bottom-20 right-4 z-50 flex h-[70vh] max-h-[500px] w-[380px] max-w-[calc(100vw-32px)] flex-col rounded-2xl border border-border bg-card shadow-2xl md:bottom-6 md:right-6 md:max-w-[calc(100vw-48px)]"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-border px-4 py-3">
