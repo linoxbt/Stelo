@@ -182,7 +182,7 @@ const sections: DocSection[] = [
           <div>
             <p className="font-semibold text-foreground">Borrowing Against Collateral</p>
             <p>
-              Each asset has a 75% Loan-to-Value ratio. Supply $1,000 of RIA, and you can borrow up to $750 of any supported token. Borrowing creates vDebt tokens that track your growing obligation. Interest accrues continuously based on pool utilization.
+             Each asset has a 75% Loan-to-Value ratio. Supply $1,000 of RLO, and you can borrow up to $750 of any supported token. Borrowing creates vDebt tokens that track your growing obligation. Interest accrues continuously based on pool utilization.
             </p>
           </div>
           <div>
