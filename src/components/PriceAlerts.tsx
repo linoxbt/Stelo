@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Bell, BellRing, Plus, Trash2, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,7 +24,7 @@ import { toast } from "sonner";
 import { TokenIcon } from "@/components/TokenIcon";
 import { usePriceAlertsDb } from "@/hooks/use-price-alerts-db";
 
-const TOKENS = ["RLO", "WETH", "USDT", "ALND"];
+const TOKENS = ["RLO", "WETH", "USDT", "STL"];
 
 interface PriceAlertsProps {
   prices: Record<string, number>;

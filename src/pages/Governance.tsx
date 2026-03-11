@@ -22,9 +22,9 @@ interface Proposal {
 
 const proposals: Proposal[] = [
   { id: 1, title: "Increase WETH collateral factor to 82%", description: "Adjust the WETH collateral factor from 78% to 82% to improve capital efficiency.", status: "active", forVotes: 1250000, againstVotes: 320000, endDate: "3 days" },
-  { id: 2, title: "Add ALND/RLO liquidity pool", description: "Create a new ALND/RLO liquidity pool with 0.3% swap fee and 28% APR incentive.", status: "active", forVotes: 890000, againstVotes: 150000, endDate: "5 days" },
+  { id: 2, title: "Add STL/RLO liquidity pool", description: "Create a new STL/RLO liquidity pool with 0.3% swap fee and 28% APR incentive.", status: "active", forVotes: 890000, againstVotes: 150000, endDate: "5 days" },
   { id: 3, title: "Reduce liquidation penalty to 4%", description: "Lower the liquidation penalty from 5% to 4% to reduce cascading liquidations.", status: "passed", forVotes: 2100000, againstVotes: 450000, endDate: "Ended" },
-  { id: 4, title: "Treasury grant for security audit", description: "Allocate 50,000 ALND from treasury for a comprehensive smart contract audit.", status: "passed", forVotes: 3200000, againstVotes: 100000, endDate: "Ended" },
+  { id: 4, title: "Treasury grant for security audit", description: "Allocate 50,000 STL from treasury for a comprehensive smart contract audit.", status: "passed", forVotes: 3200000, againstVotes: 100000, endDate: "Ended" },
 ];
 
 export default function Governance() {
@@ -42,7 +42,7 @@ export default function Governance() {
     await new Promise((r) => setTimeout(r, 1500));
     toast({
       title: support ? "Voted For" : "Voted Against",
-      description: `Cast ${votingPower.toFixed(0)} ALND votes on proposal #${proposalId}`,
+      description: `Cast ${votingPower.toFixed(0)} STL votes on proposal #${proposalId}`,
     });
     setVoting(null);
   };
@@ -64,24 +64,22 @@ export default function Governance() {
     <DashboardLayout>
       <div className="mb-6">
         <h1 className="text-xl font-bold text-foreground sm:text-2xl">Governance</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Vote on proposals using your staked ALND tokens.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Vote on proposals using your staked STL tokens.</p>
       </div>
 
-      {/* Voting power */}
       <Card className="mb-6 border-primary/20 bg-primary/5">
         <CardContent className="flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
             <Gavel className="h-5 w-5 text-primary" />
             <div>
               <p className="text-sm font-medium text-primary">Your Voting Power</p>
-              <p className="text-xs text-primary/70">Based on staked ALND</p>
+              <p className="text-xs text-primary/70">Based on staked STL</p>
             </div>
           </div>
-          <p className="text-lg font-bold text-primary">{votingPower.toFixed(0)} ALND</p>
+          <p className="text-lg font-bold text-primary">{votingPower.toFixed(0)} STL</p>
         </CardContent>
       </Card>
 
-      {/* Proposals */}
       <div className="space-y-4">
         {proposals.map((p) => {
           const total = p.forVotes + p.againstVotes;

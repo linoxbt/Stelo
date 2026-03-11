@@ -17,11 +17,10 @@ interface AtRiskPosition {
   bonus: string;
 }
 
-// Simulated at-risk positions for the liquidation dashboard
 const simulatedAtRisk: AtRiskPosition[] = [
-  { wallet: "0x3f4a...8c21", collateral: "500 RIA", debt: "200 USDT", hf: 1.12, bonus: "5%" },
+  { wallet: "0x3f4a...8c21", collateral: "500 RLO", debt: "200 USDT", hf: 1.12, bonus: "5%" },
   { wallet: "0x7b2e...d4f9", collateral: "0.8 WETH", debt: "650 USDT", hf: 0.98, bonus: "5%" },
-  { wallet: "0x1c9d...a3e7", collateral: "1200 ALND", debt: "4500 USDT", hf: 1.05, bonus: "5%" },
+  { wallet: "0x1c9d...a3e7", collateral: "1200 STL", debt: "4500 USDT", hf: 1.05, bonus: "5%" },
 ];
 
 export default function Liquidation() {
@@ -56,7 +55,6 @@ export default function Liquidation() {
         </CardContent>
       </Card>
 
-      {/* Stats */}
       <div className="mb-6 grid gap-4 grid-cols-3">
         <Card className="border-border bg-card">
           <CardContent className="p-4 text-center">
@@ -78,7 +76,6 @@ export default function Liquidation() {
         </Card>
       </div>
 
-      {/* At-risk positions */}
       <Card className="border-border bg-card">
         <CardHeader><CardTitle className="text-sm text-foreground">At-Risk Positions</CardTitle></CardHeader>
         <CardContent className="space-y-3">

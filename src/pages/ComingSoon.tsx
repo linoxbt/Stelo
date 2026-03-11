@@ -8,7 +8,7 @@ const features: Record<string, { icon: React.ReactNode; title: string; descripti
   community: {
     icon: <Users className="h-8 w-8" />,
     title: "Community Hub",
-    description: "A dedicated space for the ArcLend community to connect, discuss, and shape the protocol's future.",
+    description: "A dedicated space for the Stelo community to connect, discuss, and shape the protocol's future.",
     details: [
       "Discussion forums and proposal threads",
       "Community-driven analytics",
@@ -30,7 +30,7 @@ const features: Record<string, { icon: React.ReactNode; title: string; descripti
   governance: {
     icon: <Gavel className="h-8 w-8" />,
     title: "Governance",
-    description: "On-chain governance powered by ALND token holders to shape the future of ArcLend.",
+    description: "On-chain governance powered by STL token holders to shape the future of Stelo.",
     details: [
       "On-chain proposal creation and voting",
       "Token-weighted governance",

@@ -39,13 +39,12 @@ export default function Staking() {
   const [loading, setLoading] = useState(false);
   const [, setTick] = useState(0);
 
-  // Real-time reward ticking
   useEffect(() => {
     const interval = setInterval(() => setTick((t) => t + 1), 5000);
     return () => clearInterval(interval);
   }, []);
 
-  const alndBalance = vs.state.balances.ALND || 0;
+  const stlBalance = vs.state.balances.STL || 0;
   const totalStaked = vs.state.staking.reduce((s, p) => s + p.amount, 0);
   const poolShare = PROTOCOL_TOTAL_STAKED > 0 ? (totalStaked / (PROTOCOL_TOTAL_STAKED + totalStaked)) * 100 : 0;
 
@@ -56,10 +55,10 @@ export default function Staking() {
     await new Promise((r) => setTimeout(r, 1500));
     const ok = vs.stake(num, lockDays);
     if (ok) {
-      toast({ title: "Staked Successfully", description: `Staked ${num} ALND${lockDays > 0 ? ` for ${lockDays} days` : " (flexible)"}` });
+      toast({ title: "Staked Successfully", description: `Staked ${num} STL${lockDays > 0 ? ` for ${lockDays} days` : " (flexible)"}` });
       setStakeAmount("");
     } else {
-      toast({ title: "Insufficient ALND", description: "Claim tokens from the faucet first", variant: "destructive" });
+      toast({ title: "Insufficient STL", description: "Claim tokens from the faucet first", variant: "destructive" });
     }
     setLoading(false);
   };
@@ -81,7 +80,7 @@ export default function Staking() {
     await new Promise((r) => setTimeout(r, 1000));
     const rewards = vs.claimStakingRewards(index);
     if (rewards > 0) {
-      toast({ title: "Rewards Claimed!", description: `+${rewards.toFixed(6)} ALND` });
+      toast({ title: "Rewards Claimed!", description: `+${rewards.toFixed(6)} STL` });
     } else {
       toast({ title: "No rewards", description: "Rewards are still accumulating", variant: "destructive" });
     }
@@ -97,7 +96,7 @@ export default function Staking() {
         <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
           <Wallet className="mb-4 h-12 w-12 text-muted-foreground" />
           <h2 className="mb-2 text-xl font-bold text-foreground">Connect Your Wallet</h2>
-          <p className="mb-6 max-w-md text-sm text-muted-foreground">Connect your wallet to stake ALND and earn rewards.</p>
+          <p className="mb-6 max-w-md text-sm text-muted-foreground">Connect your wallet to stake STL and earn rewards.</p>
           <WalletButton />
         </div>
       </DashboardLayout>
@@ -107,17 +106,16 @@ export default function Staking() {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-foreground sm:text-2xl">ALND Staking</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Stake ALND to earn rewards and participate in governance.</p>
+        <h1 className="text-xl font-bold text-foreground sm:text-2xl">STL Staking</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Stake STL to earn rewards and participate in governance.</p>
       </div>
 
-      {/* Overview cards */}
       <div className="mb-6 grid gap-4 grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "Your Staked", value: `${totalStaked.toFixed(2)} ALND` },
-          { label: "ALND Balance", value: `${alndBalance.toFixed(2)} ALND` },
+          { label: "Your Staked", value: `${totalStaked.toFixed(2)} STL` },
+          { label: "STL Balance", value: `${stlBalance.toFixed(2)} STL` },
           { label: "Pool Share", value: `${poolShare.toFixed(4)}%` },
-          { label: "Protocol Staked", value: `${(PROTOCOL_TOTAL_STAKED / 1e6).toFixed(1)}M ALND` },
+          { label: "Protocol Staked", value: `${(PROTOCOL_TOTAL_STAKED / 1e6).toFixed(1)}M STL` },
         ].map((s, i) => (
           <Card key={i} className="border-border bg-card">
             <CardContent className="p-4 text-center">
@@ -128,7 +126,6 @@ export default function Staking() {
         ))}
       </div>
 
-      {/* APY Tiers */}
       <Card className="mb-6 border-border bg-card">
         <CardHeader><CardTitle className="text-sm text-foreground">APY by Lock Period</CardTitle></CardHeader>
         <CardContent>
@@ -157,11 +154,11 @@ export default function Staking() {
               <div>
                 <div className="mb-1.5 flex items-center justify-between">
                   <label className="text-xs text-muted-foreground">Amount to Stake</label>
-                  <span className="text-xs text-muted-foreground">Balance: {alndBalance.toFixed(2)} ALND</span>
+                  <span className="text-xs text-muted-foreground">Balance: {stlBalance.toFixed(2)} STL</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Input placeholder="0.00" value={stakeAmount} onChange={(e) => setStakeAmount(e.target.value)} className="border-border bg-secondary" />
-                  <Button variant="outline" size="sm" onClick={() => setStakeAmount(alndBalance.toString())}>MAX</Button>
+                  <Button variant="outline" size="sm" onClick={() => setStakeAmount(stlBalance.toString())}>MAX</Button>
                 </div>
               </div>
 
@@ -184,11 +181,11 @@ export default function Staking() {
               <div className="rounded-lg border border-border bg-secondary/30 p-3 space-y-2 text-xs">
                 <div className="flex justify-between"><span className="text-muted-foreground">Estimated APY</span><span className="text-green-500 font-bold">{effectiveAPY}%</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Lock Period</span><span className="text-foreground">{lockDays === 0 ? "Flexible (no lock)" : `${lockDays} days`}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Estimated Daily</span><span className="text-foreground">{stakeAmount ? ((parseFloat(stakeAmount) || 0) * effectiveAPY / 100 / 365).toFixed(4) : "0.0000"} ALND</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Estimated Daily</span><span className="text-foreground">{stakeAmount ? ((parseFloat(stakeAmount) || 0) * effectiveAPY / 100 / 365).toFixed(4) : "0.0000"} STL</span></div>
               </div>
 
               <Button className="w-full glow-purple" disabled={!stakeAmount || loading} onClick={handleStake}>
-                {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Staking...</> : "Stake ALND"}
+                {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Staking...</> : "Stake STL"}
               </Button>
             </CardContent>
           </Card>
@@ -200,7 +197,7 @@ export default function Staking() {
               {vs.state.staking.length === 0 && vs.state.stakingPendingWithdrawals.length === 0 ? (
                 <div className="flex h-40 flex-col items-center justify-center text-center">
                   <p className="text-sm text-muted-foreground">No staked positions</p>
-                  <p className="mt-1 text-xs text-muted-foreground">Stake ALND to see your positions here</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Stake STL to see your positions here</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -210,7 +207,7 @@ export default function Staking() {
                     return (
                       <div key={i} className="flex items-center justify-between rounded-lg border border-border bg-secondary/30 p-4">
                         <div>
-                          <p className="text-sm font-bold text-foreground">{pos.amount.toFixed(2)} ALND</p>
+                          <p className="text-sm font-bold text-foreground">{pos.amount.toFixed(2)} STL</p>
                           <p className="text-xs text-muted-foreground">{pos.lockDays === 0 ? "Flexible" : `${pos.lockDays}-day lock`}</p>
                           {isLocked && (
                             <p className="text-xs text-orange-500 flex items-center gap-1 mt-1">
@@ -231,7 +228,7 @@ export default function Staking() {
                       {vs.state.stakingPendingWithdrawals.map((w, i) => (
                         <div key={i} className="flex items-center justify-between rounded-lg border border-border bg-secondary/30 p-4">
                           <div>
-                            <p className="text-sm font-bold text-foreground">{w.amount.toFixed(2)} ALND</p>
+                            <p className="text-sm font-bold text-foreground">{w.amount.toFixed(2)} STL</p>
                             <p className="text-xs text-muted-foreground flex items-center gap-1">
                               <Clock className="h-3 w-3" />
                               {Date.now() >= w.availableAt ? "Ready to withdraw" : `Available in ${formatTime(w.availableAt - Date.now())}`}
@@ -240,7 +237,7 @@ export default function Staking() {
                         </div>
                       ))}
                       {vs.state.stakingPendingWithdrawals.some((w) => Date.now() >= w.availableAt) && (
-                        <Button className="w-full" onClick={() => { vs.claimPendingWithdrawals(); toast({ title: "Withdrawn", description: "ALND returned to wallet" }); }}>
+                        <Button className="w-full" onClick={() => { vs.claimPendingWithdrawals(); toast({ title: "Withdrawn", description: "STL returned to wallet" }); }}>
                           Claim Available Withdrawals
                         </Button>
                       )}
@@ -258,7 +255,7 @@ export default function Staking() {
               {vs.state.staking.length === 0 ? (
                 <div className="flex h-40 flex-col items-center justify-center text-center">
                   <p className="text-sm text-muted-foreground">No staking rewards</p>
-                  <p className="mt-1 text-xs text-muted-foreground">Stake ALND to start earning</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Stake STL to start earning</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -268,10 +265,10 @@ export default function Staking() {
                     return (
                       <div key={i} className="flex items-center justify-between rounded-lg border border-border bg-secondary/30 p-4">
                         <div>
-                          <p className="text-sm font-bold text-foreground">{pos.amount.toFixed(2)} ALND staked</p>
+                          <p className="text-sm font-bold text-foreground">{pos.amount.toFixed(2)} STL staked</p>
                           <p className="text-xs text-muted-foreground">{pos.lockDays === 0 ? "Flexible" : `${pos.lockDays}-day lock`} • {(12 * multiplier).toFixed(0)}% APY</p>
                           <p className="text-xs text-green-500 mt-1">
-                            Pending: {rewards.toFixed(6)} ALND
+                            Pending: {rewards.toFixed(6)} STL
                           </p>
                         </div>
                         <Button size="sm" disabled={rewards <= 0 || loading} onClick={() => handleClaimRewards(i)}>
