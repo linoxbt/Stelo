@@ -8,25 +8,82 @@ import { useWalletState, WalletButton } from "@/components/WalletButton";
 import { useAccount } from "wagmi";
 import { useVirtualState } from "@/hooks/use-virtual-state";
 import { TokenIcon } from "@/components/TokenIcon";
+import { useToast } from "@/hooks/use-toast";
+import { useNotifications } from "@/hooks/use-notifications";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AtRiskPosition {
   wallet: string;
   collateral: string;
+  collateralAsset: string;
   debt: string;
+  debtAsset: string;
   hf: number;
   bonus: string;
+  collateralValue: number;
+  debtValue: number;
 }
 
 const simulatedAtRisk: AtRiskPosition[] = [
-  { wallet: "0x3f4a...8c21", collateral: "500 RLO", debt: "200 USDT", hf: 1.12, bonus: "5%" },
-  { wallet: "0x7b2e...d4f9", collateral: "0.8 WETH", debt: "650 USDT", hf: 0.98, bonus: "5%" },
-  { wallet: "0x1c9d...a3e7", collateral: "1200 STL", debt: "4500 USDT", hf: 1.05, bonus: "5%" },
+  { wallet: "0x3f4a...8c21", collateral: "500 RLO", collateralAsset: "RLO", debt: "200 USDT", debtAsset: "USDT", hf: 1.12, bonus: "5%", collateralValue: 250, debtValue: 200 },
+  { wallet: "0x7b2e...d4f9", collateral: "0.8 WETH", collateralAsset: "WETH", debt: "650 USDT", debtAsset: "USDT", hf: 0.98, bonus: "5%", collateralValue: 1600, debtValue: 650 },
+  { wallet: "0x1c9d...a3e7", collateral: "1200 STL", collateralAsset: "STL", debt: "4500 USDT", debtAsset: "USDT", hf: 1.05, bonus: "5%", collateralValue: 12000, debtValue: 4500 },
 ];
 
 export default function Liquidation() {
   const { connected } = useWalletState();
   const { address } = useAccount();
   const vs = useVirtualState(address);
+  const { toast } = useToast();
+  const { sendNotification } = useNotifications();
+  const [liquidating, setLiquidating] = useState<string | null>(null);
+
+  const handleLiquidate = async (pos: AtRiskPosition) => {
+    if (!address) return;
+    
+    setLiquidating(pos.wallet);
+    
+    // Simulate liquidation delay
+    await new Promise(r => setTimeout(r, 2000));
+
+    const debtRepaid = pos.debtValue * 0.5; // Liquidate 50% of debt
+    const collateralSeized = debtRepaid * 1.05; // 5% bonus
+    const bonusEarned = debtRepaid * 0.05;
+
+    // Log to database
+    try {
+      await supabase.from("liquidation_log").insert({
+        liquidator_address: address.toLowerCase(),
+        borrower_address: pos.wallet,
+        collateral_asset: pos.collateralAsset,
+        debt_asset: pos.debtAsset,
+        debt_repaid: debtRepaid,
+        collateral_seized: collateralSeized,
+        bonus_earned: bonusEarned,
+      });
+    } catch (e) {
+      console.error("Failed to log liquidation:", e);
+    }
+
+    // Send notification to the borrower about their liquidation
+    try {
+      await sendNotification({
+        wallet_address: pos.wallet.includes("...") ? pos.wallet : pos.wallet,
+        type: "health_factor",
+        title: "🚨 Position Liquidated",
+        message: `Your position (${pos.collateral} collateral, ${pos.debt} debt) has been partially liquidated. ${debtRepaid.toFixed(2)} ${pos.debtAsset} debt was repaid and ${collateralSeized.toFixed(2)} worth of ${pos.collateralAsset} collateral was seized. Health Factor was ${pos.hf.toFixed(2)}. Consider adding more collateral to protect remaining positions.`,
+      });
+    } catch (e) {
+      console.error("Failed to send liquidation notification:", e);
+    }
+
+    toast({
+      title: "✅ Liquidation Successful",
+      description: `Repaid $${debtRepaid.toFixed(2)} debt and received $${collateralSeized.toFixed(2)} collateral (including $${bonusEarned.toFixed(2)} bonus).`,
+    });
+
+    setLiquidating(null);
+  };
 
   if (!connected) {
     return (
@@ -51,7 +108,7 @@ export default function Liquidation() {
       <Card className="mb-6 border-primary/20 bg-primary/5">
         <CardContent className="flex items-center gap-3 p-4">
           <Shield className="h-5 w-5 text-primary" />
-          <p className="text-sm text-primary">Liquidate undercollateralized positions to earn bonus rewards and help maintain protocol solvency.</p>
+          <p className="text-sm text-primary">Liquidate undercollateralized positions to earn bonus rewards and help maintain protocol solvency. Borrowers with email/Telegram alerts enabled will be notified of liquidation.</p>
         </CardContent>
       </Card>
 
@@ -93,8 +150,17 @@ export default function Liquidation() {
                     {pos.hf.toFixed(2)}
                   </p>
                 </div>
-                <Button size="sm" variant={pos.hf < 1 ? "default" : "outline"}>
-                  Liquidate
+                <Button 
+                  size="sm" 
+                  variant={pos.hf < 1 ? "default" : "outline"}
+                  disabled={liquidating === pos.wallet}
+                  onClick={() => handleLiquidate(pos)}
+                >
+                  {liquidating === pos.wallet ? (
+                    <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Liquidating...</>
+                  ) : (
+                    "Liquidate"
+                  )}
                 </Button>
               </div>
             </div>

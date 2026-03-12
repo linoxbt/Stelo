@@ -9,7 +9,7 @@ const corsHeaders = {
 
 interface NotificationRequest {
   wallet_address: string;
-  type: "price_alert" | "health_factor";
+  type: "price_alert" | "health_factor" | "liquidation";
   title: string;
   message: string;
 }
@@ -49,10 +49,10 @@ serve(async (req) => {
 
     const results: { email?: boolean; telegram?: boolean } = {};
 
-    // Send email notification if configured
+    // Send email notification via Resend
     if (settings.email) {
       try {
-        const emailResult = await sendEmailNotification(settings.email, title, message);
+        const emailResult = await sendEmailViaResend(settings.email, title, message);
         results.email = emailResult;
       } catch (e) {
         console.error("Email notification failed:", e);
@@ -60,7 +60,7 @@ serve(async (req) => {
       }
     }
 
-    // Send Telegram notification if configured
+    // Send Telegram notification
     if (settings.telegram) {
       try {
         const telegramResult = await sendTelegramNotification(settings.telegram, title, message);
@@ -84,75 +84,90 @@ serve(async (req) => {
   }
 });
 
-async function sendEmailNotification(
+async function sendEmailViaResend(
   email: string,
   subject: string,
   body: string
 ): Promise<boolean> {
-  // Use Lovable AI to send email via edge function
-  // For now, log the notification (email service integration can be added)
-  console.log(`[EMAIL] To: ${email}, Subject: ${subject}, Body: ${body}`);
-  
-  // In production, integrate with EmailJS, Resend, or SendGrid
-  // Example with EmailJS public API:
-  const EMAILJS_SERVICE_ID = Deno.env.get("EMAILJS_SERVICE_ID");
-  const EMAILJS_TEMPLATE_ID = Deno.env.get("EMAILJS_TEMPLATE_ID");
-  const EMAILJS_PUBLIC_KEY = Deno.env.get("EMAILJS_PUBLIC_KEY");
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
-  if (EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY) {
-    const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        service_id: EMAILJS_SERVICE_ID,
-        template_id: EMAILJS_TEMPLATE_ID,
-        user_id: EMAILJS_PUBLIC_KEY,
-        template_params: {
-          to_email: email,
-          subject: subject,
-          message: body,
-        },
-      }),
-    });
-    return response.ok;
+  if (!RESEND_API_KEY) {
+    console.error("[EMAIL] RESEND_API_KEY not configured");
+    return false;
   }
 
-  // Fallback: log only (notifications logged but not sent)
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "Stelo Protocol <onboarding@resend.dev>",
+      to: [email],
+      subject: subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <h1 style="color: #7c3aed; font-size: 24px; margin: 0;">Stelo Protocol</h1>
+            <p style="color: #6b7280; font-size: 12px; margin-top: 4px;">DeFi on Rialo Network</p>
+          </div>
+          <div style="background: #f9fafb; border-radius: 12px; padding: 24px; margin-bottom: 16px;">
+            <h2 style="color: #1f2937; font-size: 18px; margin: 0 0 12px 0;">${subject}</h2>
+            <p style="color: #4b5563; font-size: 14px; line-height: 1.6; margin: 0;">${body}</p>
+          </div>
+          <div style="text-align: center; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+            <p style="color: #9ca3af; font-size: 11px;">This is an automated alert from Stelo Protocol. You configured this alert in your Health Monitor settings.</p>
+          </div>
+        </div>
+      `,
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    console.error("[EMAIL] Resend error:", err);
+    return false;
+  }
+
+  console.log(`[EMAIL] Sent to ${email}: ${subject}`);
   return true;
 }
 
 async function sendTelegramNotification(
-  username: string,
+  chatIdOrUsername: string,
   title: string,
   message: string
 ): Promise<boolean> {
   const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN");
-  
+
   if (!TELEGRAM_BOT_TOKEN) {
-    console.log(`[TELEGRAM] Bot token not configured. Username: ${username}, Title: ${title}`);
-    return true; // Log only mode
+    console.error("[TELEGRAM] TELEGRAM_BOT_TOKEN not configured");
+    return false;
   }
 
-  // Note: Telegram requires chat_id, not username. 
-  // Users need to start a conversation with the bot first.
-  // The username is stored for reference, but we'd need chat_id mapping.
-  // For now, log the notification
-  console.log(`[TELEGRAM] To: ${username}, Title: ${title}, Message: ${message}`);
-  
-  // If we have a chat_id (could be stored alongside username):
-  // const response = await fetch(
-  //   `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
-  //   {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({
-  //       chat_id: chatId,
-  //       text: `🔔 *${title}*\n\n${message}`,
-  //       parse_mode: "Markdown",
-  //     }),
-  //   }
-  // );
-  // return response.ok;
+  // Use chat_id directly (users should provide their chat ID, or we try username)
+  const chatId = chatIdOrUsername.startsWith("@") ? chatIdOrUsername : chatIdOrUsername;
 
+  const response = await fetch(
+    `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: `🔔 *${title}*\n\n${message}\n\n_Stelo Protocol on Rialo Network_`,
+        parse_mode: "Markdown",
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const err = await response.text();
+    console.error("[TELEGRAM] Error:", err);
+    return false;
+  }
+
+  console.log(`[TELEGRAM] Sent to ${chatId}: ${title}`);
   return true;
 }

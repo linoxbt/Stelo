@@ -6,6 +6,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { MobileNav } from "./MobileNav";
+import logo from "@/assets/logo.png";
+import { Link } from "react-router-dom";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const isMobile = useIsMobile();
@@ -37,7 +39,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   <Menu className="h-5 w-5" />
                 </button>
               )}
-              <span className="text-sm text-muted-foreground">ArcLend Protocol</span>
+              {isMobile && (
+                <Link to="/" className="flex items-center gap-2">
+                  <img src={logo} alt="Stelo" className="h-6 w-6" />
+                  <span className="text-sm font-bold text-foreground">Stelo</span>
+                </Link>
+              )}
             </div>
             {isMobile && (
               <div className="flex items-center gap-1">
