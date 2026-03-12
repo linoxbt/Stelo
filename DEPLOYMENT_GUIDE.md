@@ -1,13 +1,13 @@
-# ArcLend Deployment Guide — Base Sepolia
+# Stelo Deployment Guide — Rialo Network
 
-This guide covers deploying all ArcLend smart contracts on **Base Sepolia** testnet using Remix IDE.
+This guide covers deploying all Stelo smart contracts on **Rialo Testnet** using Remix IDE.
 
-> **Important:** ETH is the only "real" token on Base Sepolia. WETH and USDT are custom ERC-20 tokens deployed specifically for testing ArcLend.
+> **Important:** RLO is the native gas token on Rialo. WETH and USDT are custom ERC-20 tokens deployed specifically for testing Stelo.
 
 ## Prerequisites
 
-- MetaMask connected to Base Sepolia (Chain ID: 84532)
-- Testnet ETH from [Base Sepolia Faucet](https://www.alchemy.com/faucets/base-sepolia)
+- MetaMask connected to Rialo Testnet
+- Testnet RLO for gas fees
 - [Remix IDE](https://remix.ethereum.org)
 
 ---
@@ -22,7 +22,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MockUSDT is ERC20, Ownable {
-    constructor() ERC20("ArcLend USDT", "USDT") Ownable(msg.sender) {
+    constructor() ERC20("Stelo USDT", "USDT") Ownable(msg.sender) {
         _mint(msg.sender, 1_000_000 * 10**decimals());
     }
 
@@ -40,7 +40,7 @@ contract MockUSDT is ERC20, Ownable {
 1. Create `MockUSDT.sol` and paste the code
 2. Compile with Solidity `0.8.20`
 3. Set Environment to "Injected Provider - MetaMask"
-4. Ensure MetaMask is on Base Sepolia
+4. Ensure MetaMask is on Rialo Testnet
 5. Deploy and save the contract address
 
 ---
@@ -55,7 +55,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MockWETH is ERC20, Ownable {
-    constructor() ERC20("ArcLend WETH", "WETH") Ownable(msg.sender) {
+    constructor() ERC20("Stelo WETH", "WETH") Ownable(msg.sender) {
         _mint(msg.sender, 10_000 * 10**decimals());
     }
 
@@ -279,7 +279,7 @@ contract LiquidityPool is ERC20 {
     uint256 public reserveA;
     uint256 public reserveB;
 
-    constructor(address _tokenA, address _tokenB) ERC20("ArcLend LP", "ARC-LP") {
+    constructor(address _tokenA, address _tokenB) ERC20("Stelo LP", "STL-LP") {
         tokenA = IERC20(_tokenA);
         tokenB = IERC20(_tokenB);
     }
