@@ -12,7 +12,7 @@ ABOUT STELO FINANCE:
 Stelo Finance is the Unified Liquidity Layer for Rialo Network. It combines lending and borrowing, token swaps, liquidity pools, staking, and governance into a single unified protocol. It draws inspiration from Aave's proven lending model but is purpose-built for the Rialo Network ecosystem. Stelo Finance is built and developed by Lino.
 
 1. LENDING & BORROWING
-- Supply supported assets (RLO, WETH, USDT, STL) into lending pools to earn variable interest (Supply APY).
+- Supply supported assets (RLO, USDT, STL, RIA) into lending pools to earn variable interest (Supply APY).
 - Borrow against supplied collateral. Each asset has a Loan-to-Value (LTV) ratio (currently 75%) that determines how much you can borrow relative to your collateral value.
 - A Health Factor (HF) tracks position safety: HF = (Collateral x Price x Liquidation Threshold) / (Debt x Price). If HF drops below 1.0, your position may be liquidated.
 - Liquidation carries a 5% penalty. Liquidators repay the debt and receive the collateral plus the bonus.
