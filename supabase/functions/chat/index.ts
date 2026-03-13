@@ -43,9 +43,9 @@ Stelo Finance is the Unified Liquidity Layer for Rialo Network. It combines lend
 
 8. SUPPORTED ASSETS
 - RLO: Rialo Network's native gas and utility token.
-- WETH: Wrapped Ether.
 - USDT: Tether USD stablecoin.
-- STL: Stelo's governance and staking token.
+- STL: Stelo Finance's governance and staking token.
+- RIA: Rialo ecosystem token.
 
 ABOUT RIALO NETWORK:
 - Rialo Network is an EVM-compatible Layer 1 blockchain focused on scalable, low-cost dApps.
