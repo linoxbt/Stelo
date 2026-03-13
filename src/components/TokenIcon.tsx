@@ -2,9 +2,9 @@ import { cn } from "@/lib/utils";
 
 const TOKEN_IMAGES: Record<string, string> = {
   RLO: "/assets/tokens/rlo.png",
-  WETH: "/assets/tokens/weth.png",
   USDT: "/assets/tokens/usdt.png",
   STL: "/assets/tokens/stl.png",
+  RIA: "/assets/tokens/ria.png",
 };
 
 export function TokenIcon({ symbol, size = "md" }: { symbol: string; size?: "sm" | "md" | "lg" }) {

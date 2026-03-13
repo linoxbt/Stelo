@@ -9,8 +9,8 @@ const TOUR_KEY = "stelo_onboarding_done";
 const steps = [
   {
     icon: Wallet,
-    title: "Welcome to Stelo",
-    description: "Your all-in-one DeFi protocol on Rialo Network. Let's take a quick tour of the key features.",
+    title: "Welcome to Stelo Finance",
+    description: "The Unified Liquidity Layer for Rialo Network. Let's take a quick tour of the key features.",
   },
   {
     icon: BarChart3,
@@ -94,10 +94,7 @@ export function OnboardingTour() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <button
-            onClick={dismiss}
-            className="absolute right-4 top-4 text-muted-foreground hover:text-foreground transition-colors"
-          >
+          <button onClick={dismiss} className="absolute right-4 top-4 text-muted-foreground hover:text-foreground transition-colors">
             <X className="h-4 w-4" />
           </button>
 
@@ -109,15 +106,9 @@ export function OnboardingTour() {
             <h2 className="mb-2 text-lg font-bold text-foreground">{current.title}</h2>
             <p className="mb-6 text-sm leading-relaxed text-muted-foreground">{current.description}</p>
 
-            {/* Progress dots */}
             <div className="mb-5 flex gap-1.5">
               {steps.map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    i === step ? "w-6 bg-primary" : "w-1.5 bg-muted-foreground/30"
-                  }`}
-                />
+                <div key={i} className={`h-1.5 rounded-full transition-all duration-300 ${i === step ? "w-6 bg-primary" : "w-1.5 bg-muted-foreground/30"}`} />
               ))}
             </div>
 

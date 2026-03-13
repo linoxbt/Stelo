@@ -3,23 +3,23 @@ import { useState, useEffect, useCallback, useRef } from "react";
 // Token prices (simulated with plus/minus 1% fluctuation)
 export const BASE_PRICES: Record<string, number> = {
   RLO: 0.50,
-  WETH: 2000,
   USDT: 1.0,
   STL: 10,
+  RIA: 0.75,
 };
 
 export const INITIAL_BALANCES: Record<string, number> = {
   RLO: 100,
-  WETH: 0,
   USDT: 0,
   STL: 0,
+  RIA: 0,
 };
 
 export const FAUCET_AMOUNTS: Record<string, number> = {
   RLO: 100,
-  WETH: 1,
   USDT: 1000,
   STL: 100,
+  RIA: 200,
 };
 
 export const FAUCET_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24h
@@ -109,12 +109,18 @@ function getKey(address: string) {
 
 function loadState(address: string): VirtualState {
   try {
-    // Try new key first, fallback to old key for migration
     let raw = localStorage.getItem(getKey(address));
     if (!raw) {
       raw = localStorage.getItem(`arclend_virtual_${address.toLowerCase()}`);
     }
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Migrate: remove WETH balances if present
+      if (parsed.balances && 'WETH' in parsed.balances) {
+        delete parsed.balances.WETH;
+      }
+      return parsed;
+    }
   } catch {}
   return { ...DEFAULT_STATE, balances: { ...INITIAL_BALANCES } };
 }
@@ -135,7 +141,6 @@ export function useVirtualState(address: string | undefined) {
   const [prices, setPrices] = useState<Record<string, number>>({ ...BASE_PRICES });
   const addressRef = useRef(address);
 
-  // Load on address change
   useEffect(() => {
     addressRef.current = address;
     if (address) {
@@ -145,12 +150,10 @@ export function useVirtualState(address: string | undefined) {
     }
   }, [address]);
 
-  // Persist on state change
   useEffect(() => {
     if (addressRef.current) saveState(addressRef.current, state);
   }, [state]);
 
-  // Price fluctuation every 30s
   useEffect(() => {
     const interval = setInterval(() => {
       setPrices((prev) => {
@@ -184,7 +187,6 @@ export function useVirtualState(address: string | undefined) {
     []
   );
 
-  // Faucet
   const canClaim = useCallback(
     (token: string) => {
       const last = state.faucetCooldowns[token] || 0;
@@ -223,7 +225,6 @@ export function useVirtualState(address: string | undefined) {
     [canClaim, addTx]
   );
 
-  // Supply
   const supply = useCallback(
     (asset: string, amount: number, apy: number) => {
       if (amount <= 0 || (state.balances[asset] || 0) < amount) return false;
@@ -256,7 +257,6 @@ export function useVirtualState(address: string | undefined) {
     [state.supplies, addTx]
   );
 
-  // Borrow
   const borrow = useCallback(
     (asset: string, amount: number, apy: number) => {
       if (amount <= 0) return false;
@@ -301,14 +301,13 @@ export function useVirtualState(address: string | undefined) {
     [state.borrows, state.balances, addTx]
   );
 
-  // Swap
   const swap = useCallback(
     (fromToken: string, toToken: string, fromAmount: number) => {
       if (fromAmount <= 0 || (state.balances[fromToken] || 0) < fromAmount) return false;
       const fromPrice = prices[fromToken] || 0;
       const toPrice = prices[toToken] || 0;
       if (toPrice === 0) return false;
-      const toAmount = (fromAmount * fromPrice) / toPrice * 0.997; // 0.3% fee
+      const toAmount = (fromAmount * fromPrice) / toPrice * 0.997;
       setState((prev) => ({
         ...prev,
         balances: {
@@ -323,9 +322,9 @@ export function useVirtualState(address: string | undefined) {
     [state.balances, prices, addTx]
   );
 
-  // Staking
+  // Staking - Max 24% APY for 365-day lock
   const APY_MULTIPLIERS: Record<number, number> = { 0: 1, 30: 1.25, 90: 1.5, 180: 2, 365: 3 };
-  const BASE_STAKING_APY = 4;
+  const BASE_STAKING_APY = 8; // 8% base => 8*3 = 24% max
 
   const stake = useCallback(
     (amount: number, lockDays: number) => {
@@ -357,7 +356,6 @@ export function useVirtualState(address: string | undefined) {
       const pos = state.staking[index];
       if (!pos) return false;
       if (pos.lockDays > 0 && Date.now() < pos.unlockTime) return false;
-      // 3-day warmup
       const availableAt = Date.now() + 3 * 24 * 60 * 60 * 1000;
       setState((prev) => ({
         ...prev,
@@ -418,7 +416,6 @@ export function useVirtualState(address: string | undefined) {
     [state.staking, getStakingRewards, addTx]
   );
 
-  // Health Factor
   const calculateHealthFactor = useCallback(() => {
     const collateralValue = state.supplies.reduce(
       (sum, s) => sum + s.amount * (prices[s.asset] || 0) * 0.80,
@@ -432,7 +429,21 @@ export function useVirtualState(address: string | undefined) {
     return collateralValue / debtValue;
   }, [state.supplies, state.borrows, prices]);
 
-  // LP
+  // Borrow limit calculation
+  const calculateBorrowLimit = useCallback(() => {
+    return state.supplies.reduce(
+      (sum, s) => sum + s.amount * (prices[s.asset] || 0) * 0.75,
+      0
+    );
+  }, [state.supplies, prices]);
+
+  const calculateBorrowUsed = useCallback(() => {
+    return state.borrows.reduce(
+      (sum, b) => sum + b.amount * (prices[b.asset] || 0),
+      0
+    );
+  }, [state.borrows, prices]);
+
   const addLiquidity = useCallback(
     (tokenA: string, tokenB: string, amountA: number, amountB: number) => {
       if (
@@ -478,7 +489,6 @@ export function useVirtualState(address: string | undefined) {
     [state.lpPositions, addTx]
   );
 
-  // Alert Settings
   const updateAlertSettings = useCallback(
     (settings: Partial<VirtualState["alertSettings"]>) => {
       setState((prev) => ({
@@ -506,9 +516,12 @@ export function useVirtualState(address: string | undefined) {
     getStakingRewards,
     claimStakingRewards,
     calculateHealthFactor,
+    calculateBorrowLimit,
+    calculateBorrowUsed,
     addLiquidity,
     removeLiquidity,
     updateAlertSettings,
     apyMultipliers: APY_MULTIPLIERS,
+    baseStakingApy: BASE_STAKING_APY,
   };
 }

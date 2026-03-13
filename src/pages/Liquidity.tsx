@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Wallet, Loader2 } from "lucide-react";
+import { Wallet, Loader2, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,9 +22,9 @@ interface Pool {
 
 const pools: Pool[] = [
   { tokenA: "RLO", tokenB: "USDT", tvl: "$245,000", volume24h: "$12,500", apr: "24.5%" },
-  { tokenA: "RLO", tokenB: "WETH", tvl: "$180,000", volume24h: "$8,200", apr: "18.2%" },
-  { tokenA: "USDT", tokenB: "WETH", tvl: "$320,000", volume24h: "$15,800", apr: "15.8%" },
-  { tokenA: "STL", tokenB: "USDT", tvl: "$95,000", volume24h: "$4,200", apr: "32.1%" },
+  { tokenA: "RLO", tokenB: "STL", tvl: "$120,000", volume24h: "$6,300", apr: "19.8%" },
+  { tokenA: "STL", tokenB: "USDT", tvl: "$95,000", volume24h: "$4,200", apr: "22.1%" },
+  { tokenA: "RIA", tokenB: "USDT", tvl: "$78,000", volume24h: "$3,800", apr: "18.5%" },
 ];
 
 export default function Liquidity() {
@@ -37,14 +37,21 @@ export default function Liquidity() {
   const [amountA, setAmountA] = useState("");
   const [amountB, setAmountB] = useState("");
   const [loading, setLoading] = useState(false);
+  const [approvalStep, setApprovalStep] = useState<"idle" | "approving" | "approved">("idle");
 
   const handleAdd = async () => {
     if (!selectedPool) return;
     const a = parseFloat(amountA);
     const b = parseFloat(amountB);
     if (isNaN(a) || isNaN(b) || a <= 0 || b <= 0) return;
+    
+    setApprovalStep("approving");
+    await new Promise((r) => setTimeout(r, 1000));
+    setApprovalStep("approved");
+    await new Promise((r) => setTimeout(r, 400));
+    
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
+    await new Promise((r) => setTimeout(r, 1200));
     const ok = vs.addLiquidity(selectedPool.tokenA, selectedPool.tokenB, a, b);
     if (ok) {
       toast({ title: "Liquidity Added", description: `Added ${a} ${selectedPool.tokenA} + ${b} ${selectedPool.tokenB}` });
@@ -52,6 +59,7 @@ export default function Liquidity() {
       toast({ title: "Insufficient Balance", variant: "destructive" });
     }
     setLoading(false);
+    setApprovalStep("idle");
     setAddOpen(false);
   };
 
@@ -85,8 +93,8 @@ export default function Liquidity() {
 
       <div className="mb-6 grid gap-4 grid-cols-3">
         {[
-          { label: "Total TVL", value: "$840,000" },
-          { label: "24h Volume", value: "$40,700" },
+          { label: "Total TVL", value: "$538,000" },
+          { label: "24h Volume", value: "$26,800" },
           { label: "Your Positions", value: vs.state.lpPositions.length.toString() },
         ].map((s, i) => (
           <Card key={i} className="border-border bg-card">
@@ -112,7 +120,7 @@ export default function Liquidity() {
                 <div><p className="text-muted-foreground">24h Vol</p><p className="font-medium text-foreground">{pool.volume24h}</p></div>
                 <div><p className="text-muted-foreground">APR</p><p className="font-bold text-green-500">{pool.apr}</p></div>
               </div>
-              <Button size="sm" onClick={() => { setSelectedPool(pool); setAmountA(""); setAmountB(""); setAddOpen(true); }}>Add Liquidity</Button>
+              <Button size="sm" onClick={() => { setSelectedPool(pool); setAmountA(""); setAmountB(""); setApprovalStep("idle"); setAddOpen(true); }}>Add Liquidity</Button>
             </CardContent>
           </Card>
         ))}
@@ -162,8 +170,28 @@ export default function Liquidity() {
               </div>
               <Input placeholder="0.00" value={amountB} onChange={(e) => setAmountB(e.target.value)} className="border-border bg-secondary" />
             </div>
-            <Button className="w-full glow-purple" disabled={!amountA || !amountB || loading} onClick={handleAdd}>
-              {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Adding...</> : "Add Liquidity"}
+            
+            {approvalStep !== "idle" && (
+              <div className="rounded-lg border border-border bg-secondary/30 p-3 space-y-2">
+                <div className="flex items-center gap-2 text-xs">
+                  {approvalStep === "approving" ? (
+                    <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                  ) : (
+                    <CheckCircle className="h-3 w-3 text-green-500" />
+                  )}
+                  <span className={approvalStep === "approving" ? "text-primary" : "text-green-500"}>
+                    {approvalStep === "approving" ? "Approving token spending..." : "Tokens approved ✓"}
+                  </span>
+                </div>
+              </div>
+            )}
+            
+            <Button className="w-full glow-purple" disabled={!amountA || !amountB || loading || approvalStep === "approving"} onClick={handleAdd}>
+              {approvalStep === "approving" ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Approving...</>
+              ) : loading ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Adding...</>
+              ) : "Add Liquidity"}
             </Button>
           </div>
         </DialogContent>

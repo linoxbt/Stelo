@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowDownUp, Settings, RefreshCw, Loader2 } from "lucide-react";
+import { ArrowDownUp, Settings, Loader2, CheckCircle, Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useWalletState, WalletButton } from "@/components/WalletButton";
@@ -14,10 +13,10 @@ import { useVirtualState } from "@/hooks/use-virtual-state";
 import { TokenIcon } from "@/components/TokenIcon";
 
 const tokens = [
-  { symbol: "RLO", name: "Rialo" },
-  { symbol: "WETH", name: "Wrapped Ether" },
-  { symbol: "USDT", name: "Tether USD" },
-  { symbol: "STL", name: "Stelo Token" },
+  { symbol: "RLO", name: "Rialo", address: "0x1234...abcd" },
+  { symbol: "USDT", name: "Tether USD", address: "0x5678...efgh" },
+  { symbol: "STL", name: "Stelo Token", address: "0x9abc...ijkl" },
+  { symbol: "RIA", name: "Rialo Asset", address: "0xdef0...mnop" },
 ];
 
 export default function Swap() {
@@ -30,13 +29,26 @@ export default function Swap() {
   const [fromAmount, setFromAmount] = useState("");
   const [slippage, setSlippage] = useState("0.5");
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [swapping, setSwapping] = useState(false);
+  const [swapStep, setSwapStep] = useState<"idle" | "approving" | "confirming" | "signing">("idle");
+  const [tokenSelectOpen, setTokenSelectOpen] = useState<"from" | "to" | null>(null);
+  const [tokenSearch, setTokenSearch] = useState("");
 
   const handleSwap = async () => {
     const num = parseFloat(fromAmount);
     if (isNaN(num) || num <= 0) return;
-    setSwapping(true);
-    await new Promise((r) => setTimeout(r, 1500));
+
+    // Step 1: Approval
+    setSwapStep("approving");
+    await new Promise((r) => setTimeout(r, 1000));
+
+    // Step 2: Confirmation
+    setSwapStep("confirming");
+    await new Promise((r) => setTimeout(r, 800));
+
+    // Step 3: Signing
+    setSwapStep("signing");
+    await new Promise((r) => setTimeout(r, 1200));
+
     const result = vs.swap(fromToken, toToken, num);
     if (result !== false) {
       toast({ title: "Swap Successful", description: `Swapped ${num} ${fromToken} for ${(result as number).toFixed(4)} ${toToken}` });
@@ -44,7 +56,7 @@ export default function Swap() {
     } else {
       toast({ title: "Swap Failed", description: "Insufficient balance", variant: "destructive" });
     }
-    setSwapping(false);
+    setSwapStep("idle");
   };
 
   const flipTokens = () => {
@@ -59,6 +71,27 @@ export default function Swap() {
     : "";
   const rate = fromPrice && toPrice ? (fromPrice / toPrice).toFixed(4) : "--";
   const fromBalance = vs.state.balances[fromToken] || 0;
+
+  const filteredTokens = tokens.filter((t) => {
+    const search = tokenSearch.toLowerCase();
+    return (
+      t.symbol.toLowerCase().includes(search) ||
+      t.name.toLowerCase().includes(search) ||
+      t.address.toLowerCase().includes(search)
+    );
+  });
+
+  const handleSelectToken = (symbol: string) => {
+    if (tokenSelectOpen === "from") {
+      if (symbol === toToken) setToToken(fromToken);
+      setFromToken(symbol);
+    } else {
+      if (symbol === fromToken) setFromToken(toToken);
+      setToToken(symbol);
+    }
+    setTokenSelectOpen(null);
+    setTokenSearch("");
+  };
 
   return (
     <DashboardLayout>
@@ -84,18 +117,10 @@ export default function Swap() {
                   <span className="text-xs text-muted-foreground">Balance: {fromBalance.toFixed(4)} {fromToken}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Select value={fromToken} onValueChange={setFromToken}>
-                    <SelectTrigger className="h-10 w-36 border-border bg-card">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {tokens.filter(t => t.symbol !== toToken).map(t => (
-                        <SelectItem key={t.symbol} value={t.symbol}>
-                          <span className="flex items-center gap-2"><TokenIcon symbol={t.symbol} size="sm" /> {t.symbol}</span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Button variant="outline" className="h-10 min-w-[120px] border-border bg-card justify-start gap-2" onClick={() => { setTokenSelectOpen("from"); setTokenSearch(""); }}>
+                    <TokenIcon symbol={fromToken} size="sm" />
+                    <span className="text-sm font-medium">{fromToken}</span>
+                  </Button>
                   <Input
                     placeholder="0.0"
                     value={fromAmount}
@@ -118,18 +143,10 @@ export default function Swap() {
                   <span className="text-xs text-muted-foreground">Balance: {(vs.state.balances[toToken] || 0).toFixed(4)} {toToken}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Select value={toToken} onValueChange={setToToken}>
-                    <SelectTrigger className="h-10 w-36 border-border bg-card">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {tokens.filter(t => t.symbol !== fromToken).map(t => (
-                        <SelectItem key={t.symbol} value={t.symbol}>
-                          <span className="flex items-center gap-2"><TokenIcon symbol={t.symbol} size="sm" /> {t.symbol}</span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Button variant="outline" className="h-10 min-w-[120px] border-border bg-card justify-start gap-2" onClick={() => { setTokenSelectOpen("to"); setTokenSearch(""); }}>
+                    <TokenIcon symbol={toToken} size="sm" />
+                    <span className="text-sm font-medium">{toToken}</span>
+                  </Button>
                   <Input
                     placeholder="0.0"
                     value={estimatedOutput}
@@ -145,9 +162,45 @@ export default function Swap() {
                 <div className="flex justify-between"><span>Fee</span><span className="text-foreground">0.3%</span></div>
               </div>
 
+              {/* Swap Steps */}
+              {swapStep !== "idle" && (
+                <div className="rounded-lg border border-border bg-secondary/30 p-3 space-y-2">
+                  <div className="flex items-center gap-2 text-xs">
+                    {swapStep === "approving" ? (
+                      <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                    ) : (
+                      <CheckCircle className="h-3 w-3 text-green-500" />
+                    )}
+                    <span className={swapStep === "approving" ? "text-primary" : "text-green-500"}>
+                      {swapStep === "approving" ? "Approving token spending..." : "Token approved ✓"}
+                    </span>
+                  </div>
+                  {swapStep !== "approving" && (
+                    <div className="flex items-center gap-2 text-xs">
+                      {swapStep === "confirming" ? (
+                        <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                      ) : swapStep === "signing" ? (
+                        <CheckCircle className="h-3 w-3 text-green-500" />
+                      ) : (
+                        <div className="h-3 w-3 rounded-full border border-muted-foreground/30" />
+                      )}
+                      <span className={swapStep === "confirming" ? "text-primary" : swapStep === "signing" ? "text-green-500" : "text-muted-foreground"}>
+                        {swapStep === "confirming" ? "Confirming swap..." : "Swap confirmed ✓"}
+                      </span>
+                    </div>
+                  )}
+                  {swapStep === "signing" && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                      <span className="text-primary">Signing transaction...</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {connected ? (
-                <Button className="w-full glow-purple" disabled={!fromAmount || swapping} onClick={handleSwap}>
-                  {swapping ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Swapping...</> : "Swap"}
+                <Button className="w-full glow-purple" disabled={!fromAmount || swapStep !== "idle"} onClick={handleSwap}>
+                  {swapStep !== "idle" ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...</> : "Swap"}
                 </Button>
               ) : (
                 <div className="flex justify-center"><WalletButton /></div>
@@ -176,6 +229,46 @@ export default function Swap() {
           </Card>
         </motion.div>
       </div>
+
+      {/* Token Select Dialog */}
+      <Dialog open={tokenSelectOpen !== null} onOpenChange={() => { setTokenSelectOpen(null); setTokenSearch(""); }}>
+        <DialogContent className="border-border bg-card sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">Select Token</DialogTitle>
+            <DialogDescription className="text-muted-foreground">Search by name, ticker, or address</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search name, symbol, or address..."
+                value={tokenSearch}
+                onChange={(e) => setTokenSearch(e.target.value)}
+                className="pl-9 border-border bg-secondary"
+              />
+            </div>
+            <div className="space-y-1 max-h-[300px] overflow-y-auto">
+              {filteredTokens.map((t) => (
+                <button
+                  key={t.symbol}
+                  onClick={() => handleSelectToken(t.symbol)}
+                  className="flex w-full items-center gap-3 rounded-lg border border-border bg-secondary/30 p-3 hover:border-primary/30 transition-colors"
+                >
+                  <TokenIcon symbol={t.symbol} size="sm" />
+                  <div className="text-left flex-1">
+                    <p className="text-sm font-medium text-foreground">{t.symbol}</p>
+                    <p className="text-[10px] text-muted-foreground">{t.name}</p>
+                  </div>
+                  <span className="text-xs text-muted-foreground">{(vs.state.balances[t.symbol] || 0).toFixed(2)}</span>
+                </button>
+              ))}
+              {filteredTokens.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-4">No tokens found</p>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
         <DialogContent className="border-border bg-card sm:max-w-sm">

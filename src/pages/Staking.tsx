@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Wallet, Lock, Unlock, Gift, Loader2, Clock } from "lucide-react";
+import { Wallet, Lock, Unlock, Gift, Loader2, Clock, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +37,7 @@ export default function Staking() {
   const [stakeAmount, setStakeAmount] = useState("");
   const [lockDays, setLockDays] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [approvalStep, setApprovalStep] = useState<"idle" | "approving" | "approved">("idle");
   const [, setTick] = useState(0);
 
   useEffect(() => {
@@ -47,12 +48,20 @@ export default function Staking() {
   const stlBalance = vs.state.balances.STL || 0;
   const totalStaked = vs.state.staking.reduce((s, p) => s + p.amount, 0);
   const poolShare = PROTOCOL_TOTAL_STAKED > 0 ? (totalStaked / (PROTOCOL_TOTAL_STAKED + totalStaked)) * 100 : 0;
+  const BASE_APY = vs.baseStakingApy;
 
   const handleStake = async () => {
     const num = parseFloat(stakeAmount);
     if (isNaN(num) || num <= 0) return;
+    
+    // Approval step
+    setApprovalStep("approving");
+    await new Promise((r) => setTimeout(r, 1000));
+    setApprovalStep("approved");
+    await new Promise((r) => setTimeout(r, 400));
+    
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
+    await new Promise((r) => setTimeout(r, 1200));
     const ok = vs.stake(num, lockDays);
     if (ok) {
       toast({ title: "Staked Successfully", description: `Staked ${num} STL${lockDays > 0 ? ` for ${lockDays} days` : " (flexible)"}` });
@@ -61,6 +70,7 @@ export default function Staking() {
       toast({ title: "Insufficient STL", description: "Claim tokens from the faucet first", variant: "destructive" });
     }
     setLoading(false);
+    setApprovalStep("idle");
   };
 
   const handleUnstake = async (index: number) => {
@@ -88,7 +98,7 @@ export default function Staking() {
   };
 
   const selectedLock = LOCK_OPTIONS.find((l) => l.days === lockDays)!;
-  const effectiveAPY = 12 * selectedLock.multiplier;
+  const effectiveAPY = BASE_APY * selectedLock.multiplier;
 
   if (!connected) {
     return (
@@ -133,7 +143,7 @@ export default function Staking() {
             {LOCK_OPTIONS.map((opt) => (
               <div key={opt.days} className="rounded-lg border border-border bg-secondary/30 p-3 text-center">
                 <p className="text-xs text-muted-foreground">{opt.label}</p>
-                <p className="text-lg font-bold text-green-500">{(12 * opt.multiplier).toFixed(0)}%</p>
+                <p className="text-lg font-bold text-green-500">{(BASE_APY * opt.multiplier).toFixed(0)}%</p>
                 <p className="text-[10px] text-muted-foreground">{opt.multiplier}x multiplier</p>
               </div>
             ))}
@@ -184,8 +194,27 @@ export default function Staking() {
                 <div className="flex justify-between"><span className="text-muted-foreground">Estimated Daily</span><span className="text-foreground">{stakeAmount ? ((parseFloat(stakeAmount) || 0) * effectiveAPY / 100 / 365).toFixed(4) : "0.0000"} STL</span></div>
               </div>
 
-              <Button className="w-full glow-purple" disabled={!stakeAmount || loading} onClick={handleStake}>
-                {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Staking...</> : "Stake STL"}
+              {approvalStep !== "idle" && (
+                <div className="rounded-lg border border-border bg-secondary/30 p-3 space-y-2">
+                  <div className="flex items-center gap-2 text-xs">
+                    {approvalStep === "approving" ? (
+                      <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                    ) : (
+                      <CheckCircle className="h-3 w-3 text-green-500" />
+                    )}
+                    <span className={approvalStep === "approving" ? "text-primary" : "text-green-500"}>
+                      {approvalStep === "approving" ? "Approving STL spending..." : "STL spending approved ✓"}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <Button className="w-full glow-purple" disabled={!stakeAmount || loading || approvalStep === "approving"} onClick={handleStake}>
+                {approvalStep === "approving" ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Approving...</>
+                ) : loading ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Staking...</>
+                ) : "Stake STL"}
               </Button>
             </CardContent>
           </Card>
@@ -266,7 +295,7 @@ export default function Staking() {
                       <div key={i} className="flex items-center justify-between rounded-lg border border-border bg-secondary/30 p-4">
                         <div>
                           <p className="text-sm font-bold text-foreground">{pos.amount.toFixed(2)} STL staked</p>
-                          <p className="text-xs text-muted-foreground">{pos.lockDays === 0 ? "Flexible" : `${pos.lockDays}-day lock`} • {(12 * multiplier).toFixed(0)}% APY</p>
+                          <p className="text-xs text-muted-foreground">{pos.lockDays === 0 ? "Flexible" : `${pos.lockDays}-day lock`} • {(BASE_APY * multiplier).toFixed(0)}% APY</p>
                           <p className="text-xs text-green-500 mt-1">
                             Pending: {rewards.toFixed(6)} STL
                           </p>

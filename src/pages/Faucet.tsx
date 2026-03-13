@@ -12,9 +12,9 @@ import { TokenIcon } from "@/components/TokenIcon";
 
 const faucetTokens = [
   { symbol: "RLO", name: "Rialo", description: "Native gas & utility token" },
-  { symbol: "WETH", name: "Wrapped Ether", description: "Wrapped version of Ethereum" },
   { symbol: "USDT", name: "Tether USD", description: "Stablecoin pegged to USD" },
   { symbol: "STL", name: "Stelo Token", description: "Governance & staking token" },
+  { symbol: "RIA", name: "Rialo Asset", description: "Rialo ecosystem token" },
 ];
 
 function formatCountdown(ms: number): string {
@@ -77,7 +77,7 @@ export default function Faucet() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="mb-6">
             <h1 className="text-xl font-bold text-foreground sm:text-2xl">Testnet Faucet</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Claim free testnet tokens to try out Stelo. Each token can be claimed once every 24 hours.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Claim free testnet tokens to try out Stelo Finance. Each token can be claimed once every 24 hours.</p>
           </div>
 
           {!connected && (
@@ -145,7 +145,7 @@ export default function Faucet() {
                   "Connect your wallet to Rialo Testnet",
                   "Click \"Claim\" on each token or use \"Claim All Tokens\"",
                   "Tokens are added to your virtual balance instantly",
-                  "Start using Stelo to supply, borrow, swap, and stake!",
+                  "Start using Stelo Finance to supply, borrow, swap, and stake!",
                 ].map((step, i) => (
                   <div key={i} className="flex items-start gap-3 text-xs text-muted-foreground">
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">{i + 1}</span>

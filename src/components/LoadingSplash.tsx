@@ -6,8 +6,8 @@ export function LoadingSplash() {
     <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background">
       <motion.img
         src={logo}
-        alt="Stelo"
-        className="h-16 w-16 mb-6"
+        alt="Stelo Finance"
+        className="h-16 w-16 mb-6 dark:brightness-150"
         initial={{ scale: 0.7, opacity: 0 }}
         animate={{ scale: [0.7, 1.1, 1], opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -18,7 +18,7 @@ export function LoadingSplash() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        Stelo
+        Stelo Finance
       </motion.h1>
       <motion.div
         className="flex gap-1.5"

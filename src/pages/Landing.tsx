@@ -26,8 +26,8 @@ export default function Landing() {
       <nav className="border-b border-border/50 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
           <Link to="/" className="flex items-center gap-3">
-            <img src={logo} alt="Stelo" className="h-8 w-8" />
-            <span className="text-lg font-bold text-foreground">Stelo</span>
+            <img src={logo} alt="Stelo Finance" className="h-8 w-8 dark:brightness-150" />
+            <span className="text-lg font-bold text-foreground">Stelo Finance</span>
           </Link>
           <div className="hidden items-center gap-6 md:flex">
             <button onClick={() => navigate("/markets")} className="text-sm text-muted-foreground hover:text-foreground">Markets</button>
@@ -55,13 +55,13 @@ export default function Landing() {
             </div>
 
             <h1 className="mb-6 text-4xl font-bold leading-tight tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-              Your Complete
+              The Unified
               <br />
-              <span className="text-gradient-purple">DeFi Protocol</span>
+              <span className="text-gradient-purple">Liquidity Layer</span>
             </h1>
 
             <p className="mx-auto mb-10 max-w-xl text-base text-muted-foreground sm:text-lg">
-              Lend, borrow, swap, stake, and provide liquidity. All from one unified protocol on Rialo Network.
+              Stelo Finance — The Unified Liquidity Layer for Rialo Network. Lend, borrow, swap, stake, and provide liquidity from one protocol.
             </p>
 
             <div className="mb-16 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">

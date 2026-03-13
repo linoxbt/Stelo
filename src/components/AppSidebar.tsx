@@ -31,8 +31,8 @@ export function AppSidebar({ onClose }: { onClose: () => void }) {
     <div className="flex h-full flex-col border-r border-border bg-card">
       <div className="flex items-center justify-between p-4">
         <Link to="/" className="flex items-center gap-3">
-          <img src={logo} alt="Stelo" className="h-8 w-8" />
-          <span className="text-lg font-bold text-foreground">Stelo</span>
+          <img src={logo} alt="Stelo Finance" className="h-8 w-8 dark:brightness-150" />
+          <span className="text-lg font-bold text-foreground">Stelo Finance</span>
         </Link>
         <div className="flex items-center gap-1">
           <LanguageSwitcher />

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Wallet, AlertTriangle, Loader2 } from "lucide-react";
+import { Wallet, AlertTriangle, Loader2, CheckCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,9 +26,9 @@ interface Asset {
 
 const assets: Asset[] = [
   { symbol: "RLO", name: "Rialo", supplyAPY: 3.5, borrowAPY: 5.2, collateralFactor: 75, liquidationThreshold: 80, totalLiquidity: "$85,000", utilization: 35 },
-  { symbol: "WETH", name: "Wrapped Ether", supplyAPY: 3.0, borrowAPY: 4.8, collateralFactor: 78, liquidationThreshold: 82, totalLiquidity: "$72,000", utilization: 40 },
   { symbol: "USDT", name: "Tether USD", supplyAPY: 4.5, borrowAPY: 6.5, collateralFactor: 75, liquidationThreshold: 80, totalLiquidity: "$195,000", utilization: 52 },
   { symbol: "STL", name: "Stelo Token", supplyAPY: 5.2, borrowAPY: 7.8, collateralFactor: 60, liquidationThreshold: 70, totalLiquidity: "$45,000", utilization: 28 },
+  { symbol: "RIA", name: "Rialo Asset", supplyAPY: 3.8, borrowAPY: 5.5, collateralFactor: 70, liquidationThreshold: 75, totalLiquidity: "$62,000", utilization: 32 },
 ];
 
 export default function Markets() {
@@ -41,23 +41,21 @@ export default function Markets() {
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const openModal = (type: "supply" | "borrow") => {
-    if (!connected) {
-      toast({ title: "Connect wallet first", description: "Please connect your EVM wallet.", variant: "destructive" });
-      return;
-    }
-    setModalType(type);
-    setSelectedAsset(null);
-    setAmount("");
-    setModalOpen(true);
-  };
+  const [approvalStep, setApprovalStep] = useState<"idle" | "approving" | "approved" | "confirming">("idle");
 
   const handleConfirm = async () => {
     if (!selectedAsset || !amount) return;
     const num = parseFloat(amount);
     if (isNaN(num) || num <= 0) return;
 
+    // Step 1: Token approval
+    setApprovalStep("approving");
+    await new Promise((r) => setTimeout(r, 1200));
+    setApprovalStep("approved");
+    await new Promise((r) => setTimeout(r, 500));
+
+    // Step 2: Confirm transaction
+    setApprovalStep("confirming");
     setLoading(true);
     await new Promise((r) => setTimeout(r, 1500));
 
@@ -77,19 +75,33 @@ export default function Markets() {
       }
     }
     setLoading(false);
+    setApprovalStep("idle");
     setModalOpen(false);
   };
 
   const balance = selectedAsset ? (vs.state.balances[selectedAsset.symbol] || 0) : 0;
+  const borrowLimit = vs.calculateBorrowLimit();
+  const borrowUsed = vs.calculateBorrowUsed();
+  const borrowAvailable = Math.max(0, borrowLimit - borrowUsed);
 
   return (
     <DashboardLayout>
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6">
         <h1 className="text-xl font-bold text-foreground sm:text-2xl">Lending Markets</h1>
-        <div className="flex gap-2">
-          <Button size="sm" onClick={() => openModal("supply")}>Supply</Button>
-          <Button size="sm" variant="outline" className="border-primary/30 text-primary" onClick={() => openModal("borrow")}>Borrow</Button>
-        </div>
+        {connected && borrowLimit > 0 && (
+          <div className="mt-2 rounded-lg border border-border bg-secondary/30 p-3">
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-muted-foreground">Borrow Limit</span>
+              <span className="text-foreground">${borrowLimit.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-muted-foreground">Used</span>
+              <span className="text-foreground">${borrowUsed.toFixed(2)} ({borrowLimit > 0 ? ((borrowUsed / borrowLimit) * 100).toFixed(1) : 0}%)</span>
+            </div>
+            <Progress value={borrowLimit > 0 ? (borrowUsed / borrowLimit) * 100 : 0} className="h-1.5" />
+            <p className="text-[10px] text-muted-foreground mt-1">Available to borrow: ${borrowAvailable.toFixed(2)}</p>
+          </div>
+        )}
       </div>
 
       <div className="space-y-3">
@@ -132,8 +144,8 @@ export default function Markets() {
                 </div>
 
                 <div className="flex gap-2 shrink-0">
-                  <Button size="sm" onClick={() => { setModalType("supply"); setSelectedAsset(asset); setAmount(""); setModalOpen(true); }}>Supply</Button>
-                  <Button size="sm" variant="outline" className="border-primary/30 text-primary" onClick={() => { setModalType("borrow"); setSelectedAsset(asset); setAmount(""); setModalOpen(true); }}>Borrow</Button>
+                  <Button size="sm" onClick={() => { setModalType("supply"); setSelectedAsset(asset); setAmount(""); setApprovalStep("idle"); setModalOpen(true); }}>Supply</Button>
+                  <Button size="sm" variant="outline" className="border-primary/30 text-primary" onClick={() => { setModalType("borrow"); setSelectedAsset(asset); setAmount(""); setApprovalStep("idle"); setModalOpen(true); }}>Borrow</Button>
                 </div>
               </CardContent>
             </Card>
@@ -156,27 +168,17 @@ export default function Markets() {
             <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-3">
               <div className="flex items-start gap-2">
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-yellow-500" />
-                <p className="text-xs text-muted-foreground">Supply assets as collateral before borrowing. Monitor your health factor.</p>
+                <div className="text-xs text-muted-foreground">
+                  <p>Supply assets as collateral before borrowing. Monitor your health factor.</p>
+                  {borrowAvailable > 0 && (
+                    <p className="mt-1 text-foreground">Available to borrow: ${borrowAvailable.toFixed(2)}</p>
+                  )}
+                </div>
               </div>
             </div>
           )}
 
           <div className="space-y-4 py-2">
-            {!selectedAsset && (
-              <div className="space-y-2">
-                {assets.map((a) => (
-                  <button
-                    key={a.symbol}
-                    onClick={() => setSelectedAsset(a)}
-                    className="flex w-full items-center gap-3 rounded-lg border border-border bg-secondary/30 p-3 hover:border-primary/30"
-                  >
-                    <TokenIcon symbol={a.symbol} size="sm" />
-                    <span className="text-sm font-medium text-foreground">{a.symbol}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-
             {selectedAsset && (
               <>
                 <div>
@@ -203,8 +205,42 @@ export default function Markets() {
                   </div>
                 </div>
 
-                <Button className="w-full glow-purple" disabled={!amount || loading} onClick={handleConfirm}>
-                  {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...</> : `Confirm ${modalType === "supply" ? "Supply" : "Borrow"}`}
+                {/* Approval Steps */}
+                {approvalStep !== "idle" && (
+                  <div className="rounded-lg border border-border bg-secondary/30 p-3 space-y-2">
+                    <div className="flex items-center gap-2 text-xs">
+                      {approvalStep === "approving" ? (
+                        <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                      ) : (
+                        <CheckCircle className="h-3 w-3 text-green-500" />
+                      )}
+                      <span className={approvalStep === "approving" ? "text-primary" : "text-green-500"}>
+                        {approvalStep === "approving" ? "Approving token spending..." : "Token spending approved ✓"}
+                      </span>
+                    </div>
+                    {(approvalStep === "approved" || approvalStep === "confirming") && (
+                      <div className="flex items-center gap-2 text-xs">
+                        {approvalStep === "confirming" ? (
+                          <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                        ) : (
+                          <div className="h-3 w-3 rounded-full border border-muted-foreground/30" />
+                        )}
+                        <span className={approvalStep === "confirming" ? "text-primary" : "text-muted-foreground"}>
+                          {approvalStep === "confirming" ? "Confirming transaction..." : "Confirm transaction"}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <Button className="w-full glow-purple" disabled={!amount || loading || approvalStep === "approving"} onClick={handleConfirm}>
+                  {approvalStep === "approving" ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Approving...</>
+                  ) : loading ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...</>
+                  ) : (
+                    `Confirm ${modalType === "supply" ? "Supply" : "Borrow"}`
+                  )}
                 </Button>
               </>
             )}

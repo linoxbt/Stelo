@@ -41,8 +41,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               )}
               {isMobile && (
                 <Link to="/" className="flex items-center gap-2">
-                  <img src={logo} alt="Stelo" className="h-6 w-6" />
-                  <span className="text-sm font-bold text-foreground">Stelo</span>
+                  <img src={logo} alt="Stelo Finance" className="h-6 w-6 dark:brightness-150" />
+                  <span className="text-sm font-bold text-foreground">Stelo Finance</span>
                 </Link>
               )}
             </div>
